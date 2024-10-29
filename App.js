@@ -31,6 +31,9 @@ import FaceScanScreen from "./LoginScreen/FaceScanScreen.js";
 // Home screen
 import Home from "./HomeScreen/Home.js";
 
+// Flight screen
+import Flight1 from './Flight_Screen/Flight1.js';
+
 export default function App() {
   return (
     <NavigationContainer initialRouteName="OnBoarding">
@@ -52,6 +55,9 @@ export default function App() {
 
             {/* Home Screen */}
             <Stack.Screen name='Home' component={Home}></Stack.Screen>
+
+            {/* Flight Screen */}
+            <Stack.Screen name='Flight1' component={Flight1}></Stack.Screen>
 
         </Stack.Navigator>
     </NavigationContainer>
