@@ -23,6 +23,7 @@ import Login from "./LoginScreen/Login.js";
 import SignUp from "./LoginScreen/SignUp.js";
 import signUpSucessScreen from "./LoginScreen/signUpSucessScreen.js";
 import ResetPassword from "./LoginScreen/ResetPassword.js";
+import VerifyCodeScreen from "./LoginScreen/VerifyCodeScreen.js";
 
 export default function App() {
   return (
@@ -38,6 +39,7 @@ export default function App() {
             <Stack.Screen name='SignUp' component={SignUp}></Stack.Screen>
             <Stack.Screen name='signUpSucessScreen' component={signUpSucessScreen}></Stack.Screen>
             <Stack.Screen name='ResetPassword' component={ResetPassword}></Stack.Screen>
+            <Stack.Screen name='VerifyCodeScreen' component={VerifyCodeScreen}></Stack.Screen>
 
         </Stack.Navigator>
     </NavigationContainer>
