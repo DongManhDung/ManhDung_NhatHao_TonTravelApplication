@@ -18,6 +18,9 @@ const Stack = createStackNavigator();
 import OnBoarding from "./OnBoarding_Screen/OnBoarding.js";
 import OnBoarding2 from "./OnBoarding_Screen/OnBoarding2.js";
 
+// SignIn Screen
+import Login from "./LoginScreen/Login.js";
+
 export default function App() {
   return (
     <NavigationContainer initialRouteName="OnBoarding">
@@ -26,6 +29,9 @@ export default function App() {
             {/* OnBoarding Flow */}
             <Stack.Screen name='OnBoarding' component={OnBoarding}></Stack.Screen>
             <Stack.Screen name='OnBoarding2' component={OnBoarding2}></Stack.Screen>
+
+            {/* SignIn Flow */}
+            <Stack.Screen name='Login1' component={Login}></Stack.Screen>
 
         </Stack.Navigator>
     </NavigationContainer>
