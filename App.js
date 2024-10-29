@@ -22,6 +22,7 @@ import OnBoarding2 from "./OnBoarding_Screen/OnBoarding2.js";
 import Login from "./LoginScreen/Login.js";
 import SignUp from "./LoginScreen/SignUp.js";
 import signUpSucessScreen from "./LoginScreen/signUpSucessScreen.js";
+import ResetPassword from "./LoginScreen/ResetPassword.js";
 
 export default function App() {
   return (
@@ -36,6 +37,7 @@ export default function App() {
             <Stack.Screen name='Login1' component={Login}></Stack.Screen>
             <Stack.Screen name='SignUp' component={SignUp}></Stack.Screen>
             <Stack.Screen name='signUpSucessScreen' component={signUpSucessScreen}></Stack.Screen>
+            <Stack.Screen name='ResetPassword' component={ResetPassword}></Stack.Screen>
 
         </Stack.Navigator>
     </NavigationContainer>
