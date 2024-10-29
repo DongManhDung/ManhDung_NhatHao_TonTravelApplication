@@ -21,6 +21,7 @@ import OnBoarding2 from "./OnBoarding_Screen/OnBoarding2.js";
 // SignIn Screen
 import Login from "./LoginScreen/Login.js";
 import SignUp from "./LoginScreen/SignUp.js";
+import signUpSucessScreen from "./LoginScreen/signUpSucessScreen.js";
 
 export default function App() {
   return (
@@ -34,6 +35,7 @@ export default function App() {
             {/* SignIn Flow */}
             <Stack.Screen name='Login1' component={Login}></Stack.Screen>
             <Stack.Screen name='SignUp' component={SignUp}></Stack.Screen>
+            <Stack.Screen name='signUpSucessScreen' component={signUpSucessScreen}></Stack.Screen>
 
         </Stack.Navigator>
     </NavigationContainer>
