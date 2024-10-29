@@ -26,6 +26,7 @@ import ResetPassword from "./LoginScreen/ResetPassword.js";
 import VerifyCodeScreen from "./LoginScreen/VerifyCodeScreen.js";
 import NewPasswordScreen from "./LoginScreen/NewPasswordScreen.js";
 import NoticePasswordChanged from "./LoginScreen/NoticePasswordChanged.js";
+import FaceScanScreen from "./LoginScreen/FaceScanScreen.js";
 
 export default function App() {
   return (
@@ -44,6 +45,7 @@ export default function App() {
             <Stack.Screen name='VerifyCodeScreen' component={VerifyCodeScreen}></Stack.Screen>
             <Stack.Screen name='NewPasswordScreen' component={NewPasswordScreen}></Stack.Screen>
             <Stack.Screen name='NoticePasswordChanged' component={NoticePasswordChanged}></Stack.Screen>
+            <Stack.Screen name='FaceScanScreen' component={FaceScanScreen}></Stack.Screen>
 
         </Stack.Navigator>
     </NavigationContainer>

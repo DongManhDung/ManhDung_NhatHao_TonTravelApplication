@@ -11,8 +11,18 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSCameraUsageDescription": "Chúng tôi cần sử dụng camera để xác thực người dùng.",
+        "NSFaceIDUsageDescription": "Chúng tôi cần sử dụng Face ID để xác thực người dùng."
+      }
     },
     "android": {
       "adaptiveIcon": {
