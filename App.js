@@ -5,7 +5,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
-
+// Bỏ hết notification log
 LogBox.ignoreAllLogs();
 
 
@@ -16,6 +16,7 @@ const Stack = createStackNavigator();
 
 // Onboarding Screen
 import OnBoarding from "./OnBoarding_Screen/OnBoarding.js";
+import OnBoarding2 from "./OnBoarding_Screen/OnBoarding2.js";
 
 export default function App() {
   return (
@@ -24,6 +25,7 @@ export default function App() {
 
             {/* OnBoarding Flow */}
             <Stack.Screen name='OnBoarding' component={OnBoarding}></Stack.Screen>
+            <Stack.Screen name='OnBoarding2' component={OnBoarding2}></Stack.Screen>
 
         </Stack.Navigator>
     </NavigationContainer>
