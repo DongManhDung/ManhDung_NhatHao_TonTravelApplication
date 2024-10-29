@@ -34,6 +34,7 @@ import Home from "./HomeScreen/Home.js";
 // Flight screen
 import Flight1 from './Flight_Screen/Flight1.js';
 import Flight2 from './Flight_Screen/Flight2.js';
+import ListDestination from './Flight_Screen/ListDestination.js';
 
 export default function App() {
   return (
@@ -60,6 +61,7 @@ export default function App() {
             {/* Flight Screen */}
             <Stack.Screen name='Flight1' component={Flight1}></Stack.Screen>
             <Stack.Screen name='Flight2' component={Flight2}></Stack.Screen>
+            <Stack.Screen name='ListDestination' component={ListDestination}></Stack.Screen>
 
         </Stack.Navigator>
     </NavigationContainer>
