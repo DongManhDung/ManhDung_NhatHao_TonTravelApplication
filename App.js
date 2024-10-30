@@ -36,6 +36,7 @@ import Flight1 from './Flight_Screen/Flight1.js';
 import Flight2 from './Flight_Screen/Flight2.js';
 import Flight3 from './Flight_Screen/Flight3.js';
 import Flight4 from './Flight_Screen/Flight4.js';
+import Flight5 from './Flight_Screen/Flight5.js';
 import ListDestination from './Flight_Screen/ListDestination.js';
 
 export default function App() {
@@ -65,6 +66,7 @@ export default function App() {
             <Stack.Screen name='Flight2' component={Flight2}></Stack.Screen>
             <Stack.Screen name='Flight3' component={Flight3}></Stack.Screen>
             <Stack.Screen name='Flight4' component={Flight4}></Stack.Screen>
+            <Stack.Screen name='Flight5' component={Flight5}></Stack.Screen>
             <Stack.Screen name='ListDestination' component={ListDestination}></Stack.Screen>
 
         </Stack.Navigator>
