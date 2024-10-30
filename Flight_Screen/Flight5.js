@@ -9,9 +9,11 @@ import {
   Alert,
 } from "react-native";
 import AntIcon from "react-native-vector-icons/AntDesign";
+import moment from 'moment';
 
 const Flight5 = ({navigation, route}) => {
-  const { item } = route.params;
+  const { item, seatClass, selectedDate, totalPassengers } = route.params;
+  const dateFormat = moment(selectedDate).format('ddd, MMM DD, YYYY');
   const [value, setValue] = useState(0);
   const items = [
     { label: "Male", value: 0 },
@@ -234,7 +236,14 @@ const Flight5 = ({navigation, route}) => {
 
                           <View style={style.seatFooter}>
                               <TouchableOpacity
-                              onPress={() => navigation.navigate('Flight6', {item, selectedSeat})}
+                              onPress={() => {
+                                if(!selectedSeat) {
+                                    Alert.alert("🔴 Warning","Please select your seat before booking!");
+                                    navigation.navigate('Flight5', {item, selectedSeat, seatClass, selectedDate ,totalPassengers});
+                                }else{
+                                    navigation.navigate('Flight6', {item, selectedSeat, seatClass, selectedDate ,totalPassengers});
+                                }
+                              }}
                                style={style.seatButton}><Text style={[style.bigText, {fontWeight: '600'}]}>Sweep To Booking</Text></TouchableOpacity>
                           </View>
                       </View>
