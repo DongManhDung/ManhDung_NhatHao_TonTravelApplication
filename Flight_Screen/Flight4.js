@@ -368,7 +368,7 @@ const Flight1 = ({navigation, route}) => {
 
               <View style={style.footerBtnContainer}>
                 <TouchableOpacity style={style.footerBtn}
-                  onPress={() => navigation.navigate('Flight5', {item})}
+                  onPress={() => navigation.navigate('Flight5', {item, seatClass, selectedDate, totalPassengers})}
                 >
                     <Text style={{fontSize: 17}}>Done, go to seat selection</Text>
                 </TouchableOpacity>
