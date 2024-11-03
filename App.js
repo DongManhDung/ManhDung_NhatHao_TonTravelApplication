@@ -45,6 +45,9 @@ import Flight7 from './Flight_Screen/Flight7.js';
 import HotelScreen1 from './HotelScreen/HotelScreen1.js';
 import HotelScreen2 from './HotelScreen/HotelScreen2.js';
 
+// Tour Screen + Activity Screen
+import BestLocationScreen1 from './Tour_ActivityScreen/BestLocationScreen1.js';
+
 export default function App() {
   return (
     <NavigationContainer initialRouteName="OnBoarding">
@@ -81,6 +84,8 @@ export default function App() {
             <Stack.Screen name='HotelScreen1' component={HotelScreen1}></Stack.Screen>
             <Stack.Screen name='HotelScreen2' component={HotelScreen2}></Stack.Screen>
 
+            {/* Tour Screen + Activity Screen */}
+            <Stack.Screen name='BestLocationScreen1' component={BestLocationScreen1}></Stack.Screen>
 
 
         </Stack.Navigator>
