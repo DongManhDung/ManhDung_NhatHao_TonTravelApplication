@@ -83,8 +83,13 @@ const Flight1 = ({navigation, route}) => {
 
   const handleReturnConfirm = (date2) => {
     const formattedReturnDate = moment(date2).format('ddd, MMM DD, YYYY');
-    setSelectedReturnDate(formattedReturnDate);
-    hideDateReturnPicker();
+    if (moment(date2) <= moment(new Date())) {
+      Alert.alert('Error', 'Return date must be after departure date!');
+    }
+    else {
+      setSelectedReturnDate(formattedReturnDate);
+      hideDateReturnPicker();
+    }
   };
 
 
@@ -247,6 +252,7 @@ const Flight1 = ({navigation, route}) => {
             display="default"
             onConfirm={handleDepartureConfirm}
             onCancel={hideDatePicker}
+            minimumDate={new Date()}
             />
 
 
@@ -277,6 +283,7 @@ const Flight1 = ({navigation, route}) => {
             display="default"
             onConfirm={handleReturnConfirm}
             onCancel={hideDateReturnPicker}
+            minimumDate={new Date()}
             />
 
             <View style={[style.formGroupContainer,{height: 50, bottom: 110}]}>

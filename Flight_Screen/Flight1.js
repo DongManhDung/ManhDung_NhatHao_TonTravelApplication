@@ -230,6 +230,7 @@ const Flight1 = ({navigation, route}) => {
             display="default"
             onConfirm={handleConfirm}
             onCancel={hideDatePicker}
+            minimumDate={new Date()}
             
             />
 
