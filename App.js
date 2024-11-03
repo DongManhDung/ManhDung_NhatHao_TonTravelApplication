@@ -47,6 +47,7 @@ import HotelScreen2 from './HotelScreen/HotelScreen2.js';
 
 // Tour Screen + Activity Screen
 import BestLocationScreen1 from './Tour_ActivityScreen/BestLocationScreen1.js';
+import DetailLocationScreen from './Tour_ActivityScreen/DetailLocationScreen.js';
 
 export default function App() {
   return (
@@ -86,6 +87,7 @@ export default function App() {
 
             {/* Tour Screen + Activity Screen */}
             <Stack.Screen name='BestLocationScreen1' component={BestLocationScreen1}></Stack.Screen>
+            <Stack.Screen name='DetailLocationScreen' component={DetailLocationScreen}></Stack.Screen>
 
 
         </Stack.Navigator>
