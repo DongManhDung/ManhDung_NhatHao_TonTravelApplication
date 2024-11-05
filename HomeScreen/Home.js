@@ -1,15 +1,15 @@
-import react, {useState} from "react";
+import react, {useEffect, useState} from "react";
 import AntIcon from "react-native-vector-icons/AntDesign";
 import { View, StyleSheet, Text, TextInput, TouchableOpacity, Image, ScrollView } from "react-native";
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { NavigationContainer } from '@react-navigation/native';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 
 const Tab = createBottomTabNavigator();
 
 const HomeComponent = ({navigation, username}) => {
-
-
     return(<ScrollView showsVerticalScrollIndicator={false}>
         
         <View style={style.container}>
@@ -131,15 +131,25 @@ const HomeComponent = ({navigation, username}) => {
 };
 
 
-const Home = ({ route }) => {
+const Home = ({ route, navigation }) => {
     const { username } = route.params;
-    
+
+    useEffect(() => {
+        const checkLoginStatus = async () => {
+            const isLoggedIn = await AsyncStorage.getItem('isLoggedIn');
+            if (isLoggedIn !== 'true') {
+                navigation.navigate('Login1');
+            }
+        };
+        checkLoginStatus();
+    }, []);
+
     return (
         <NavigationContainer independent={true}>
             <Tab.Navigator screenOptions={{headerShown: false,tabBarStyle: {backgroundColor: '#CAF0F8'} ,tabBarActiveTintColor: "black", tabBarShowLabel: true}}>
                         <Tab.Screen name="HomeComponent" options={{tabBarLabel: 'Home', tabBarIcon: ({color}) => 
                             (<MaterialCommunityIcons name="home" color={color} size={35}/>),}}>
-                                {() => <HomeComponent username={username}/>}
+                                {() => <HomeComponent username={username} navigation={navigation}/>}
                         </Tab.Screen>
             </Tab.Navigator>
         </NavigationContainer>

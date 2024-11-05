@@ -9,16 +9,31 @@ import {
     Dimensions,
     Alert,
   } from "react-native";
-  import React, { useState } from "react";
+  import React, { useState, useEffect, useRef } from "react";
   import AntIcon from "react-native-vector-icons/AntDesign";
   const screenHeight = Dimensions.get("window").height;
   const screenWidth = Dimensions.get("window").width;
   import Feather from "react-native-vector-icons/Feather";
+  import AsyncStorage from "@react-native-async-storage/async-storage";
+  import { Audio } from 'expo-av';
+  import ConfettiCannon from 'react-native-confetti-cannon'
   
   const Login = ({navigation}) => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
+    const [showConfetti, setShowConfetti] = useState(false);
+    const confettiRef = useRef(null);
+
+    const playSound = async () => {
+      const sound = new Audio.Sound();
+      try{
+        await sound.loadAsync(require('../assets/music/zapsplat_mutimedia_game_sound_simple_basic_marimba_riff_positive_007_97829.mp3'));
+        await sound.playAsync();
+      }catch (error) {
+        console.error('ERROR playing sound: ', error);
+      }
+    };
   
     const goToHome = async () => {
       if(username === '' || password === '') {
@@ -36,9 +51,16 @@ import {
           });
 
           if(response.ok){
-            Alert.alert("🟢 Success",'Login successfully!' );
-            navigation.navigate('Home', { username });
-          }else {
+            Alert.alert("🟢 Success",`Login successfully. Welcome ${username}!`);
+            await AsyncStorage.setItem('isLoggedIn', 'true');
+            await AsyncStorage.setItem('username', username);
+            await playSound();
+            // Kích hoạt hiệu ứng pháo hoa 
+            setShowConfetti(true);
+            setTimeout(() => {
+                navigation.navigate('Home', { username });
+            }, 5000);
+          } else {
             Alert.alert("🔴 Error",'Username or password not correct!' );
             navigation.navigate('Login1');
           }
@@ -121,6 +143,9 @@ import {
                   >
                     <Text style={style.textSignIn}>Sign In</Text>
                   </TouchableOpacity>
+
+                  
+
                   <TouchableOpacity
                   onPress={() => navigation.navigate('FaceScanScreen')}
                   >
@@ -150,6 +175,7 @@ import {
             </View>
           </View>
         </ImageBackground>
+        {showConfetti && ( <ConfettiCannon ref={confettiRef} count={300} origin={{ x: 0, y: 0 }} fadeOut autoStart={true} />)}
       </View>
     );
   };
