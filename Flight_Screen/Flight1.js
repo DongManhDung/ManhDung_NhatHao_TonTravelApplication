@@ -1,4 +1,4 @@
-import react, {useState} from "react";
+import react, {useState, useEffect} from "react";
 import {
   StyleSheet,
   Text,
@@ -8,6 +8,7 @@ import {
   TextInput,
   Dimensions,
   Alert,
+  ScrollView,
 } from "react-native";
 import Checkbox from "expo-checkbox";
 import AntIcon from "react-native-vector-icons/AntDesign";
@@ -17,7 +18,8 @@ const screenWidth = Dimensions.get("window").width;
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import moment from 'moment';
 import Modal from 'react-native-modal';
-import { Picker } from '@react-native-picker/picker';
+import { Picker } from '@react-native-picker/picker'
+import Feather from 'react-native-vector-icons/Feather';
 
 const Flight1 = ({navigation, route}) => {
   const [isChecked, setChecked] = useState(false);
@@ -69,7 +71,7 @@ const Flight1 = ({navigation, route}) => {
   };
 
 
-  //Tự Custom Modal Dialog cho TouchableOpacity chọn Passenger, Class
+  // Tự Custom Modal Dialog cho TouchableOpacity chọn Passenger, Class
   const [isModalVisible, setModalVisible] = useState(false);
   const [adultCount, setAdultCount] = useState(0);
   const [childCount, setChildCount] = useState(0);
@@ -97,13 +99,42 @@ const Flight1 = ({navigation, route}) => {
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if(text1 === null || text2 === null || selectedDate === 'Select Departure Date' || (adultCount === 0 && childCount === 0)) {
       Alert.alert('Error','Please fill in all fields!');
       navigation.navigate('Flight1');
     }
     else {
       const totalPassengers = adultCount + childCount;
+      // POST data to server
+      try{
+      const response = await fetch('http://10.10.88.76:3000/addFlight', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          text1,
+          text2,
+          selectedDate,
+          adultCount,
+          childCount,
+          seatClass,
+        }),
+      });
+
+      if (response.ok) {
+        console.log('Flight added successfully!');
+      }
+      else {
+        console.log('Cannot add a flight!');
+      }
+    } catch (error) {
+      console.error('ERROR: ', error);
+    }
+
+
+      // Navigation to Flight3 
       navigation.navigate('Flight3', {
         text1,
         text2,
@@ -114,8 +145,48 @@ const Flight1 = ({navigation, route}) => {
     }
     
   };
+
+  // Log recent searches
+  const [recentSearches, setRecentSearches] = useState([]);
+
+  const getRecentSearches = async () => {
+    try {
+      const response = await fetch('http://10.10.88.76:3000/getAllFlights', {
+        method: 'GET',
+      });
+      const result = await response.json();
+      setRecentSearches(result);
+    } catch (error) {
+      console.error('ERROR fetching recent searches: ', error);
+    }
+  };
+
+  
+
+
+  const handleDelete = async (id) => {
+    try { 
+      const response = await fetch(`http://10.10.88.76:3000/deleteFlight/${id}`, { 
+        method: 'DELETE', 
+      });
+      if (response.ok) { 
+        Alert.alert("🟢 Success","Flight data deleted successfully!"); 
+        setRecentSearches(recentSearches.filter(search => search.id !== id)); ///load lai dâta sau khi xoa
+      } else { 
+        Alert.alert("🔴 Error","Failed to delete flight data!"); 
+      } 
+    } catch (error) { 
+      console.error('Error deleting flight data:', error); 
+    }
+  };
+
+  useEffect(() => {
+    getRecentSearches();
+  }, []);
+
   return (
-    <View style={style.container}>
+    <ScrollView showsVerticalScrollIndicator={false} showsHorizontalScrollIndicator={false}>
+      <View style={style.container}>
       <View style={style.containerFlud}>
       <View style={style.backGroup}>
             <View style={style.backItem}>
@@ -217,7 +288,7 @@ const Flight1 = ({navigation, route}) => {
                 <View style={[style.formFullItem,style.disactivated]}>
                   <TouchableOpacity style={style.buttonShot} onPress={showDatePicker}>
                     <Text style={style.textInputShort}>
-                      {selectedDate}
+                      {selectedDate.toString()}
                     </Text>
                   </TouchableOpacity>
                 </View>
@@ -320,6 +391,7 @@ const Flight1 = ({navigation, route}) => {
 
             <View style={style.searchBtnContainer}>
               <View style={style.searchBtnFlud}>
+                  {/* Insert query in database here */}
                   <TouchableOpacity style={{width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center'}}
                   onPress={handleSubmit}
                   >
@@ -336,10 +408,60 @@ const Flight1 = ({navigation, route}) => {
         <View style={style.recentSearchedContainer}>
           <View style={style.recentSearchedContainerFlud}>
             <Text style={style.textTitle}>Recent Searches</Text>
-          </View>
+
+            {/* Log recent here */}
+            {recentSearches.length > 0 && recentSearches.map((search, index) => (
+              
+              <View key={index} style={style.recentSearchItem}>
+                <View style={{flexDirection: 'row', width: '100%'}}>
+                    <Text>One-way: <Text style={style.boldText}>{search.departure}</Text></Text>
+                    <Text> - </Text>
+                    <Text style={style.boldText}>{search.destination}</Text>
+                </View>
+                
+                <Text>Departure Date: <Text style={style.boldText}>{search.start_date}</Text></Text>
+                <View style={{flexDirection: 'row', width: '100%', columnGap: 10}}>
+                  <Text>Passengers: </Text>
+                  <Text style={style.boldText}>Adult: {search.adult}</Text>
+                  <Text> - </Text>
+                  <Text style={style.boldText}>Child: {search.child}</Text>
+                </View>
+
+                <Text>Class: <Text style={style.boldText}>{search.class}</Text></Text>
+
+                <View style={{flexDirection: 'row', width: '100%', justifyContent: 'space-between', alignItems: 'center'}}>
+                    <TouchableOpacity style={{flexDirection: 'row', alignItems: 'center', width: '25%'}}
+                        onPress={() => navigation.navigate('Flight3', {
+                          text1: search.departure,
+                          text2: search.destination,
+                          selectedDate: search.start_date,
+                          seatClass: search.class,
+                          totalPassengers: search.adult + search.child
+                        })
+                      }
+                    >
+                      <Text>Detail: </Text>
+                      <Text><AntIcon name="arrowright" size={25}></AntIcon></Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity style={{width: 40, height: 40, backgroundColor: 'white', justifyContent: 'center', alignItems: 'center', borderRadius: 50}}
+                      onPress={() => handleDelete(search.id)}
+                    >
+                      <Feather name="trash-2" size={25}></Feather>
+                    </TouchableOpacity>
+                </View>
+              </View>
+
+            ))}
+
+            
+
+            
         </View>
       </View>
     </View>
+    </View>
+    </ScrollView>
   );
 };
 
@@ -354,17 +476,16 @@ const style = StyleSheet.create({
     borderRadius: 10,
 
   },
+  boldText: {
+    fontWeight: 'bold',
+  },
   container: {
     flex: 1,
     flexDirection: "column",
   },
   containerFlud: {
     width: "100%",
-    height: 1000,
     backgroundColor: "#CAF0F8",
-    // display: "flex",
-    // justifyContent: "center",
-    // alignItems: "center",
   },
   backGroup: {
     width: "100%",
@@ -565,16 +686,26 @@ const style = StyleSheet.create({
 
   recentSearchedContainer: {
     width: "100%",
-    height: 50,
-    // backgroundColor: 'red',
-    top: 50,
-    justifyContent: "center",
+    justifyContent: "flex-start",
     alignItems: "center",
+    paddingVertical: 20,
+    marginVertical: 50,
+    flexDirection: "column",
   },
   recentSearchedContainerFlud: {
     width: "95%",
-    height: "100%",
-    justifyContent: "center",
+    justifyContent: "flex-start",
     alignItems: "flex-start",
+    rowGap: 10
+  },
+  recentSearchItem: {
+    width: '100%', 
+    height: 200, 
+    backgroundColor: '#90e0ef', 
+    borderTopStartRadius: '50%', 
+    borderBottomEndRadius: '50%', 
+    justifyContent: 'center', 
+    paddingHorizontal: 15,
+    rowGap: 10
   },
 });
