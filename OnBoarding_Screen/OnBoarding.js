@@ -34,7 +34,7 @@ import {
             playsInSilentModeIOS: true,
           });
           // Load tệp nhạc từ thư mục assets
-          await sound.current.loadAsync(require('../assets/music/helloVietNam - Phan Quynh Anh.mp4'),
+          await sound.current.loadAsync(require('../assets/music/Onboarding Sound Effect.mp3'),
           {
             shouldPlay: false,
             initialPositionMillis: 0, 
