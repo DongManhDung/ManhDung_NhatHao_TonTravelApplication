@@ -3,10 +3,12 @@ import AntIcon from "react-native-vector-icons/AntDesign";
 import { View, StyleSheet, Text, TextInput, TouchableOpacity, Image, ScrollView } from "react-native";
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { NavigationContainer } from '@react-navigation/native';
 
 const Tab = createBottomTabNavigator();
 
-const HomeComponent = ({navigation}) => {
+const HomeComponent = ({navigation, username}) => {
+
 
     return(<ScrollView showsVerticalScrollIndicator={false}>
         
@@ -32,7 +34,7 @@ const HomeComponent = ({navigation}) => {
                            <Image 
                            style={style.icon4040}
                            source={require('../assets/ImgDesign/Home Screen/Avatar.png')}></Image>
-                           <Text style={style.userText}>Andreww</Text>
+                           <Text style={style.userText}>{username}</Text>
                        </View>
                        
                    </View>
@@ -129,12 +131,18 @@ const HomeComponent = ({navigation}) => {
 };
 
 
-const Home = () => {
+const Home = ({ route }) => {
+    const { username } = route.params;
+    
     return (
-        <Tab.Navigator screenOptions={{headerShown: false,tabBarStyle: {backgroundColor: '#CAF0F8'} ,tabBarActiveTintColor: "black", tabBarShowLabel: true}}>
-            <Tab.Screen name="HomeComponent" component={HomeComponent} options={{tabBarLabel: 'Home', tabBarIcon: ({color}) => 
-           (<MaterialCommunityIcons name="home" color={color} size={35}/>),}}></Tab.Screen>
-        </Tab.Navigator>
+        <NavigationContainer independent={true}>
+            <Tab.Navigator screenOptions={{headerShown: false,tabBarStyle: {backgroundColor: '#CAF0F8'} ,tabBarActiveTintColor: "black", tabBarShowLabel: true}}>
+                        <Tab.Screen name="HomeComponent" options={{tabBarLabel: 'Home', tabBarIcon: ({color}) => 
+                            (<MaterialCommunityIcons name="home" color={color} size={35}/>),}}>
+                                {() => <HomeComponent username={username}/>}
+                        </Tab.Screen>
+            </Tab.Navigator>
+        </NavigationContainer>
     );
     
 };

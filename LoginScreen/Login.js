@@ -13,21 +13,43 @@ import {
   import AntIcon from "react-native-vector-icons/AntDesign";
   const screenHeight = Dimensions.get("window").height;
   const screenWidth = Dimensions.get("window").width;
+  import Feather from "react-native-vector-icons/Feather";
   
   const Login = ({navigation}) => {
-    const [email, setEmail] = useState("");
+    const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
   
-    const goToHome = () => {
-      if(email === '' || password === '') {
-        Alert.alert('Error', 'Please enter email and password');
-        navigation.navigate('Login');
+    const goToHome = async () => {
+      if(username === '' || password === '') {
+        Alert.alert("🔴 Error",'Please enter username or password!');
+        navigation.navigate('Login1');
       } 
       else{
-        navigation.navigate('Home');
+        try{
+          const response = await fetch('http://10.10.88.76:3000/login', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ username, password }),
+          });
+
+          if(response.ok){
+            Alert.alert("🟢 Success",'Login successfully!' );
+            navigation.navigate('Home', { username });
+          }else {
+            Alert.alert("🔴 Error",'Username or password not correct!' );
+            navigation.navigate('Login1');
+          }
+        }
+        catch (error) {
+            console.error('ERROR: ', error);
+        }
       }
-      
     };
+
+
     return (
       <View style={style.container}>
         <ImageBackground
@@ -55,26 +77,26 @@ import {
                 <View style={style.loginFormInputText}>
                   <AntIcon name="user" size={35}></AntIcon>
                   <TextInput
-                    placeholder={"E-mail"}
+                    placeholder={"Username"}
                     editable
                     style={style.textInput}
-                    value={email}
-                    onChangeText={setEmail}
+                    value={username}
+                    onChangeText={text => setUsername(text)}
                   ></TextInput>
                 </View>
   
                 <View style={style.loginFormInputText}>
                   <AntIcon name="lock" size={35}></AntIcon>
                   <TextInput
-                    secureTextEntry={true}
+                    secureTextEntry={!showPassword}
                     placeholder={"Password"}
                     editable
                     style={style.textInput}
                     value={password}
-                    onChangeText={setPassword}
+                    onChangeText={text => setPassword(text)}
                   ></TextInput>
-                  <TouchableOpacity>
-                    <AntIcon name="eye" size={35} style={{ position:'absolute',left: 0 }}></AntIcon>
+                  <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+                    <Feather name={showPassword ? 'eye-off' : 'eye'} size={35} style={{ position:'absolute',left: 0 }}></Feather>
                   </TouchableOpacity>
                 </View>
               </View>

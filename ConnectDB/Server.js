@@ -1,6 +1,8 @@
 const express = require('express');
 const mariadb = require('mariadb');
 const bodyParser = require('body-parser');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 // const cors = require('cors');
 
 const app = express();
@@ -66,6 +68,7 @@ app.delete('/deleteFlight/:id', async (req, res) => {
 });
 
 
+
 // Backend xu ly dang nhap
 // POST a user after press button
 app.post('/addUser', async (req, res) => {
@@ -79,6 +82,31 @@ app.post('/addUser', async (req, res) => {
     catch (error){
         console.error('ERROR: ', error);
         res.status(500).send('Cannot add a user!' );
+    }
+});
+
+// const secretKey = 'sapassword';
+// Get user by fullName and password for login
+app.post('/login', async (req, res) => { 
+    const { username, password } = req.body; 
+    try { 
+        const conn = await pool.getConnection(); 
+        const rows = await conn.query('SELECT * FROM user WHERE full_name = ?', [username]); 
+        conn.release(); 
+        if (rows.length > 0){
+            const user = rows[0];
+            if(password === user.password){
+                res.status(200).send('Login successfully!');
+            }else {
+                res.status(401).send('Username or password not correct!');
+            }
+        }else {
+            res.status(401).send('Username or password not correct!');
+        }
+    } 
+    catch (error) { 
+        console.error(error); 
+        res.status(500).send('Failed to login'); 
     }
 });
 
