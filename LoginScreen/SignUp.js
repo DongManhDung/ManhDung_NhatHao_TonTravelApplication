@@ -21,6 +21,58 @@ import {
     const [password, setPassword] = useState("");
     const [email, setEmail] = useState("");
 
+
+    const handleSignup = async () => {
+      const regexUsername = /^[a-zA-Z0-9]{1,20}$/;
+      const regexPassword = /^[a-zA-Z0-9]{1,20}$/;
+      const regexEmail = /^[a-zA-Z0-9]+@(gmail|yahoo)\.com$/;
+
+      if(setFullName == "" || setPassword == "" || setEmail == "" || isChecked === false){
+        Alert.alert("Please fill in all the information");
+        navigation.navigate('SignUp');
+      }
+      else if (!regexUsername.test(fullName)) {
+          Alert.alert("Username must be contain a-z, A-Z, 0-9, 20 characters max");
+          navigation.navigate('SignUp');
+      }
+      else if(!regexPassword.test(password)){
+          Alert.alert("Password must be contain a-z, A-Z, 0-9, 20 characters max");
+          navigation.navigate('SignUp');
+      }
+      else if(!regexEmail.test(email)){
+          Alert.alert("Email must be contain a-z, A-Z, 0-9, @gmail.com or @yahoo.com");
+          navigation.navigate('SignUp');
+      }
+      else{
+        try{
+          const response = await fetch('http://10.10.88.76:3000/addUser', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ 
+              fullName, 
+              password, 
+              email, 
+            })
+          });
+          if(response.ok){
+            console.log('User added successfully!');
+          } else {
+            console.log('Cannot add a user!');
+          }
+
+        }catch(error){
+          console.error('ERROR: ', error);
+          res.status(500).send('Cannot add a user!' );
+        }
+        
+        Alert.alert("Sign Up Success");
+        navigation.navigate('signUpSucessScreen')
+
+      }
+    };
+
     return (
       <View style={style.container}>
         <ImageBackground
@@ -47,10 +99,10 @@ import {
               <View style={style.loginFormGroup}>
                 <View style={style.loginFormInputText}>
                   <Text style={{ fontSize: 20, letterSpacing: 0.5 }}>
-                    FULL NAME
+                    USERNAME
                   </Text>
                   <TextInput
-                    placeholder={"Fullname"}
+                    placeholder={"Username"}
                     editable
                     style={style.textInput}
                     value={fullName}
@@ -118,33 +170,7 @@ import {
   
               <View style={style.signUpContainer}>
                 <TouchableOpacity style={{ width: "100%" }}
-                  onPress={() => {
-                    const regexUsername = /^[a-zA-Z0-9]{1,20}$/;
-                    const regexPassword = /^[a-zA-Z0-9]{1,20}$/;
-                    const regexEmail = /^[a-zA-Z0-9]+@(gmail|yahoo)\.com$/;
-
-                    if(setFullName == "" || setPassword == "" || setEmail == "" || isChecked === false){
-                      Alert.alert("Please fill in all the information");
-                      navigation.navigate('SignUp');
-                    }
-                    else if (!regexUsername.test(fullName)) {
-                        Alert.alert("Username must be contain a-z, A-Z, 0-9, 20 characters max");
-                        navigation.navigate('SignUp');
-                    }
-                    else if(!regexPassword.test(password)){
-                        Alert.alert("Password must be contain a-z, A-Z, 0-9, 20 characters max");
-                        navigation.navigate('SignUp');
-                    }
-                    else if(!regexEmail.test(email)){
-                        Alert.alert("Email must be contain a-z, A-Z, 0-9, @gmail.com or @yahoo.com");
-                        navigation.navigate('SignUp');
-                    }
-                    else{
-                      Alert.alert("Sign Up Success");
-                      navigation.navigate('signUpSucessScreen')
-                    }
-                  }}
-                >
+                  onPress={handleSignup}>
                   <Text style={[style.textSignUp]}>Sign Up</Text>
                 </TouchableOpacity>
               </View>

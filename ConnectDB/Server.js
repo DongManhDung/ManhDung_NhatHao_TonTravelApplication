@@ -21,6 +21,7 @@ app.get('/', (req, res) => {
   });
 
 
+//   Backend xu ly chon chuyen bay
 // POST a flight after press button
 app.post('/addFlight', async (req, res) => {
     const { text1, text2, selectedDate, adultCount, childCount, seatClass } = req.body;
@@ -61,6 +62,23 @@ app.delete('/deleteFlight/:id', async (req, res) => {
     } catch (error) { 
         console.error(error); 
         res.status(500).send('Failed to delete flight data'); 
+    }
+});
+
+
+// Backend xu ly dang nhap
+// POST a user after press button
+app.post('/addUser', async (req, res) => {
+    const { fullName, password, email } = req.body;
+    try{
+        const conn = await pool.getConnection();
+        await conn.query('INSERT INTO user (full_name, password, email) VALUES (?, ?, ?)', [fullName, password, email]);
+        conn.release();
+        res.status(200).send('User added successfully!');
+    }
+    catch (error){
+        console.error('ERROR: ', error);
+        res.status(500).send('Cannot add a user!' );
     }
 });
 
