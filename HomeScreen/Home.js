@@ -6,6 +6,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { NavigationContainer } from '@react-navigation/native';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Promotion from "./Promotion";
+import MySaved from "./MySaved";
 
 
 const Tab = createBottomTabNavigator();
@@ -155,6 +156,10 @@ const Home = ({ route, navigation }) => {
                         
                         <Tab.Screen name="Promotion" component={Promotion} options={{tabBarLabel: 'Voucher', tabBarIcon: ({color}) => 
                             (<MaterialCommunityIcons name="sale" color={color} size={35}/>),}}>
+                        </Tab.Screen>
+
+                        <Tab.Screen name="MySaved" component={MySaved} options={{tabBarLabel: 'My Saved', tabBarIcon: ({color}) =>
+                            (<MaterialCommunityIcons name="heart" color={color} size={35}/>),}}>
                         </Tab.Screen>
             </Tab.Navigator>
         </NavigationContainer>

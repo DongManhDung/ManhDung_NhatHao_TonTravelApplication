@@ -31,6 +31,7 @@ import FaceScanScreen from "./LoginScreen/FaceScanScreen.js";
 // Home screen
 import Home from "./HomeScreen/Home.js";
 import Promotion from "./HomeScreen/Promotion.js";
+import MySaved from "./HomeScreen/MySaved.js";
 
 // Flight screen
 import Flight1 from './Flight_Screen/Flight1.js';
@@ -72,6 +73,7 @@ export default function App() {
             {/* Home Screen */}
             <Stack.Screen name='Home' component={Home}></Stack.Screen>
             <Stack.Screen name='Promotion' component={Promotion}></Stack.Screen>
+            <Stack.Screen name='MySaved' component={MySaved}></Stack.Screen>
 
             {/* Flight Screen */}
             <Stack.Screen name='Flight1' component={Flight1}></Stack.Screen>
