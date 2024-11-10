@@ -3,6 +3,7 @@ const mariadb = require('mariadb');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const nodemailer = require('nodemailer');
 // const cors = require('cors');
 
 const app = express();
@@ -109,6 +110,57 @@ app.post('/login', async (req, res) => {
         res.status(500).send('Failed to login'); 
     }
 });
+
+
+// Backend xu ly quen mat khau
+// POST email recover password after press button
+const transporter = nodemailer.createTransport({
+    service: 'Gmail',
+    auth: {
+        user: 'tuilaton04072003@gmail.com',
+        pass: 'Dungcon2003',
+    },
+});
+
+// Generate OTP 4 digits number
+const generateOTP = () => {
+    return Math.floor(1000 + Math.random() * 9000);
+};
+
+app.post('/recoverPassword', async (req, res) => {
+    const {email} = req.body;
+    try{
+        const conn = await pool.getConnection();
+        const rows = await conn.query('SELECT * FROM user WHERE email = ?', [email]);
+        conn.release();
+        
+        if(rows.length > 0){
+            const otp = generateOTP();
+
+            const mailOption = {
+                from: 'TonTravelStaff',
+                to: email,
+                subject: 'Password Recovery with OTP',
+                text: `Hello! Thanks for using my service. This is your OTP for password recovery is: ${otp}`
+            };
+
+            transporter.sendMail(mailOption, (error, info) => {
+                if(error){
+                    console.error('ERROR: ', error);
+                    res.status(500).send('Cannot send email!');
+                }else{
+                    res.status(200).send('OTP sent successfully!');
+                }
+            });
+        }else {
+            res.status(404).send('Email not found!');
+        }
+    }catch(error){
+        console.error('ERROR: ', error);
+        res.status(500).send('Cannot recover password!');
+    }
+});
+
 
 
 // Start server

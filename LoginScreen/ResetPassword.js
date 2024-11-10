@@ -7,6 +7,7 @@ import {
     Image,
     View,
     Dimensions,
+    Alert
   } from "react-native";
   import Checkbox from "expo-checkbox";
   import React, { useState } from "react";
@@ -15,6 +16,33 @@ import {
   const screenWidth = Dimensions.get("window").width;
   
   const ResetPassword = ({navigation}) => {
+    const [email, setEmail] = useState("");
+
+
+    const sendRecoveryMail = async () => {
+      try {
+        const response = await fetch('http://10.10.88.77:3000/recoverPassword', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ email }),
+        });
+        
+        if(response.ok){
+          Alert.alert("🟢 Success",`Recovery email sent to ${email}!`);
+          navigation.navigate('VerifyCodeScreen', { email });
+        }
+        else{
+          Alert.alert("🔴 Error",`Cannot send recovery email to ${email}!`);
+          navigation.navigate('ResetPassword');
+        }
+      } catch (error) {
+        console.error('ERROR: ', error);
+      }
+
+    };
+
     return (
       <View style={style.container}>
         <ImageBackground
@@ -54,16 +82,18 @@ import {
                 <View style={style.loginFormInputText}>
                   <Text style={{ fontSize: 20, letterSpacing: 0.5 }}>E-MAIL</Text>
                   <TextInput
-                    value={"Your email is..."}
+                    value={email}
+                    onChangeText={text => setEmail(text)}
                     editable
                     style={style.textInput}
+                    placeholder="Enter your email"
                   ></TextInput>
                 </View>
               </View>
   
               <View style={style.signUpContainer}>
                 <TouchableOpacity style={{ width: "100%" }}
-                onPress={() => navigation.navigate('VerifyCodeScreen')}
+                onPress={sendRecoveryMail}
                 >
                   <Text style={[style.textSignUp]}>Reset My Password</Text>
                 </TouchableOpacity>

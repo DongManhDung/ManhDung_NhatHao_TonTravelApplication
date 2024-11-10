@@ -108,7 +108,7 @@ const Flight1 = ({navigation, route}) => {
       const totalPassengers = adultCount + childCount;
       // POST data to server
       try{
-      const response = await fetch('http://10.10.88.76:3000/addFlight', {
+      const response = await fetch('http://10.10.88.77:3000/addFlight', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -151,7 +151,7 @@ const Flight1 = ({navigation, route}) => {
 
   const getRecentSearches = async () => {
     try {
-      const response = await fetch('http://10.10.88.76:3000/getAllFlights', {
+      const response = await fetch('http://10.10.88.77:3000/getAllFlights', {
         method: 'GET',
       });
       const result = await response.json();
@@ -166,7 +166,7 @@ const Flight1 = ({navigation, route}) => {
 
   const handleDelete = async (id) => {
     try { 
-      const response = await fetch(`http://10.10.88.76:3000/deleteFlight/${id}`, { 
+      const response = await fetch(`http://10.10.88.77:3000/deleteFlight/${id}`, { 
         method: 'DELETE', 
       });
       if (response.ok) { 
