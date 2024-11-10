@@ -7,7 +7,8 @@ import { NavigationContainer } from '@react-navigation/native';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Promotion from "./Promotion";
 import MySaved from "./MySaved";
-
+import Dashboard from "./Dashboard.js";
+import { Audio } from 'expo-av';
 
 const Tab = createBottomTabNavigator();
 
@@ -135,6 +136,27 @@ const HomeComponent = ({navigation, username}) => {
 
 const Home = ({ route, navigation }) => {
     const { username } = route.params;
+    const [sound, setSound] = useState();
+
+    const playSound = async () => { const { sound } = await Audio.Sound.createAsync( 
+        require('../assets/music/short_click.mp3') 
+    ); 
+        setSound(sound); 
+        await sound.playAsync();
+    };
+
+    useEffect(() => { 
+        return sound ? () => { 
+            sound.unloadAsync(); 
+        } 
+            : undefined; 
+    }, [sound]); 
+    
+    const handleTabPress = async () => { 
+        await playSound(); 
+    };
+
+
 
     useEffect(() => {
         const checkLoginStatus = async () => {
@@ -150,16 +172,28 @@ const Home = ({ route, navigation }) => {
         <NavigationContainer independent={true}>
             <Tab.Navigator screenOptions={{headerShown: false, tabBarStyle: {backgroundColor: '#CAF0F8'} ,tabBarActiveTintColor: "black", tabBarShowLabel: true}}>
                         <Tab.Screen name="HomeComponent" options={{tabBarLabel: 'Home', tabBarIcon: ({color}) => 
-                            (<MaterialCommunityIcons name="home" color={color} size={35}/>),}}>
+                            (<MaterialCommunityIcons name="home" color={color} size={35}/>),}}
+                        listeners={{tabPress: handleTabPress}}
+                        >
                                 {() => <HomeComponent username={username} navigation={navigation}/>}
                         </Tab.Screen>
                         
                         <Tab.Screen name="Promotion" component={Promotion} options={{tabBarLabel: 'Voucher', tabBarIcon: ({color}) => 
-                            (<MaterialCommunityIcons name="sale" color={color} size={35}/>),}}>
+                            (<MaterialCommunityIcons name="sale" color={color} size={35}/>),}}
+                        listeners={{tabPress: handleTabPress}}
+                        >
                         </Tab.Screen>
 
                         <Tab.Screen name="MySaved" component={MySaved} options={{tabBarLabel: 'My Saved', tabBarIcon: ({color}) =>
-                            (<MaterialCommunityIcons name="heart" color={color} size={35}/>),}}>
+                            (<MaterialCommunityIcons name="heart" color={color} size={35}/>),}}
+                        listeners={{tabPress: handleTabPress}}    
+                        >
+                        </Tab.Screen>
+
+                        <Tab.Screen name="Dashboard" component={Dashboard} options={{tabBarLabel: 'More', tabBarIcon: ({color}) =>
+                            (<MaterialCommunityIcons name="account-circle-outline" color={color} size={35}/>),}}
+                        listeners={{tabPress: handleTabPress}}    
+                        >
                         </Tab.Screen>
             </Tab.Navigator>
         </NavigationContainer>
