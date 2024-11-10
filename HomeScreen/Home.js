@@ -9,6 +9,7 @@ import Promotion from "./Promotion";
 import MySaved from "./MySaved";
 import Dashboard from "./Dashboard.js";
 import { Audio } from 'expo-av';
+import SuperPromotionDialog from "../Dialog/SuperPromotionDialog";
 
 const Tab = createBottomTabNavigator();
 
@@ -137,6 +138,15 @@ const HomeComponent = ({navigation, username}) => {
 const Home = ({ route, navigation }) => {
     const { username } = route.params;
     const [sound, setSound] = useState();
+    const [isDialogVisible, setDialogVisible] = useState(false);
+
+    useEffect(() => { 
+        setDialogVisible(true); 
+    },[]);
+
+    const handleCloseDialog = () => { 
+        setDialogVisible(false); 
+    };
 
     const playSound = async () => { const { sound } = await Audio.Sound.createAsync( 
         require('../assets/music/short_click.mp3') 
@@ -144,6 +154,7 @@ const Home = ({ route, navigation }) => {
         setSound(sound); 
         await sound.playAsync();
     };
+    
 
     useEffect(() => { 
         return sound ? () => { 
@@ -155,6 +166,8 @@ const Home = ({ route, navigation }) => {
     const handleTabPress = async () => { 
         await playSound(); 
     };
+
+
 
 
 
@@ -170,6 +183,7 @@ const Home = ({ route, navigation }) => {
 
     return (
         <NavigationContainer independent={true}>
+            <SuperPromotionDialog isVisible={isDialogVisible} onClose={handleCloseDialog} />
             <Tab.Navigator screenOptions={{headerShown: false, tabBarStyle: {backgroundColor: '#CAF0F8'} ,tabBarActiveTintColor: "black", tabBarShowLabel: true}}>
                         <Tab.Screen name="HomeComponent" options={{tabBarLabel: 'Home', tabBarIcon: ({color}) => 
                             (<MaterialCommunityIcons name="home" color={color} size={35}/>),}}
@@ -196,6 +210,7 @@ const Home = ({ route, navigation }) => {
                         >
                         </Tab.Screen>
             </Tab.Navigator>
+            
         </NavigationContainer>
     );
     
