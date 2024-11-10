@@ -13,7 +13,18 @@ import SuperPromotionDialog from "../Dialog/SuperPromotionDialog";
 
 const Tab = createBottomTabNavigator();
 
-const HomeComponent = ({navigation, username}) => {
+const HomeComponent = ({navigation}) => {
+
+    const [username, setUsername] = useState('');
+
+    useEffect(() => { 
+        const getUsername = async () => { 
+            const name = await AsyncStorage.getItem('username'); 
+            setUsername(name || ''); 
+        };
+        getUsername(); 
+    }, []);
+
     return(<ScrollView showsVerticalScrollIndicator={false}>
         
         <View style={style.container}>
@@ -135,14 +146,21 @@ const HomeComponent = ({navigation, username}) => {
 };
 
 
-const Home = ({ route, navigation }) => {
-    const { username } = route.params;
-    const [sound, setSound] = useState();
+const Home = ({navigation}) => {
+
+    const [sound, setSound] = useState(null);
     const [isDialogVisible, setDialogVisible] = useState(false);
 
     useEffect(() => { 
+        const checkLoginStatus = async () => { 
+            const isLoggedIn = await AsyncStorage.getItem('isLoggedIn'); 
+            if (isLoggedIn !== 'true') { 
+                navigation.navigate('Login1'); 
+            } 
+        }; 
+        checkLoginStatus(); 
         setDialogVisible(true); 
-    },[]);
+    }, [navigation]);
 
     const handleCloseDialog = () => { 
         setDialogVisible(false); 
@@ -167,29 +185,14 @@ const Home = ({ route, navigation }) => {
         await playSound(); 
     };
 
-
-
-
-
-    useEffect(() => {
-        const checkLoginStatus = async () => {
-            const isLoggedIn = await AsyncStorage.getItem('isLoggedIn');
-            if (isLoggedIn !== 'true') {
-                navigation.navigate('Login1');
-            }
-        };
-        checkLoginStatus();
-    }, []);
-
     return (
-        <NavigationContainer independent={true}>
+        <View style={{flex: 1}}>
             <SuperPromotionDialog isVisible={isDialogVisible} onClose={handleCloseDialog} />
             <Tab.Navigator screenOptions={{headerShown: false, tabBarStyle: {backgroundColor: '#CAF0F8'} ,tabBarActiveTintColor: "black", tabBarShowLabel: true}}>
-                        <Tab.Screen name="HomeComponent" options={{tabBarLabel: 'Home', tabBarIcon: ({color}) => 
+                        <Tab.Screen name="HomeComponent" component={HomeComponent} options={{tabBarLabel: 'Home', tabBarIcon: ({color}) => 
                             (<MaterialCommunityIcons name="home" color={color} size={35}/>),}}
                         listeners={{tabPress: handleTabPress}}
                         >
-                                {() => <HomeComponent username={username} navigation={navigation}/>}
                         </Tab.Screen>
                         
                         <Tab.Screen name="Promotion" component={Promotion} options={{tabBarLabel: 'Voucher', tabBarIcon: ({color}) => 
@@ -206,12 +209,12 @@ const Home = ({ route, navigation }) => {
 
                         <Tab.Screen name="Dashboard" component={Dashboard} options={{tabBarLabel: 'More', tabBarIcon: ({color}) =>
                             (<MaterialCommunityIcons name="account-circle-outline" color={color} size={35}/>),}}
-                        listeners={{tabPress: handleTabPress}}    
-                        >
+                        listeners={{tabPress: handleTabPress}}  
+                        > 
                         </Tab.Screen>
+
             </Tab.Navigator>
-            
-        </NavigationContainer>
+        </View>
     );
     
 };

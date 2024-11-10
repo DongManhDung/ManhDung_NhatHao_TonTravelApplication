@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import React from "react";
+import React, {useState, useEffect} from "react";
 import {
   View,
   Text,
@@ -7,10 +7,60 @@ import {
   StyleSheet,
   ScrollView,
   Image,
+  Alert,
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export default function DashboardScreen({navigation}) {
+const Dashboard = ({ navigation }) => {
+  
+  const [username, setUsername] = useState('');
+  
+  useEffect(() => { 
+    const getUsername = async () => { 
+      const name = await AsyncStorage.getItem('username'); 
+      setUsername(name || ''); 
+    }; 
+    getUsername(); 
+  }, []); 
+
+  
+
+  const [currentDate, setCurrentDate] = useState('');
+  useEffect(() => { 
+    const formatDate = () => { 
+      const date = new Date(); 
+      const options = { 
+        day: '2-digit', 
+        month: 'short', 
+        weekday: 'long' 
+      }; 
+      return date.toLocaleDateString('en-GB', options).replace(/,/g, ''); 
+    }; 
+    setCurrentDate(formatDate()); 
+  }, []);
+
+  const handleLogout = async () => { 
+    await AsyncStorage.removeItem('isLoggedIn'); 
+    await AsyncStorage.removeItem('username');
+    Alert.alert('🟢 Success', 'You have been logged out successfully', [ 
+      { text: 'OK', onPress: () =>  navigation.navigate('Login1') }, 
+    ]); 
+  };
+
+  const confirmLogout = () => { Alert.alert( 
+      'ℹ️ Logout', 'Are you sure you want to logout?',
+      [ 
+        { text: 'No', style: 'cancel' }, 
+        { text: 'Yes', onPress: handleLogout }, 
+      ], 
+      { 
+        cancelable: false 
+      } 
+    );
+  }
+
+
   return (
     <ScrollView showsHorizontalScrollIndicator={false} showsVerticalScrollIndicator={false}
       style={styles.container}
@@ -30,8 +80,8 @@ export default function DashboardScreen({navigation}) {
           style={styles.avatar}
         />
         <View style={styles.greetingTextContainer}>
-          <Text style={styles.greetingText}>Hello, Andrew</Text>
-          <Text style={styles.dateText}>It’s 02 Dec, Monday</Text>
+          <Text style={styles.greetingText}>Hello, {username}</Text>
+          <Text style={styles.dateText}>It’s {currentDate}</Text>
         </View>
         <Image
           style={styles.imageLogo}
@@ -94,7 +144,7 @@ export default function DashboardScreen({navigation}) {
           <Ionicons name="information-circle-outline" size={23} />
           <Text style={styles.sectionTitle}>Account Setup</Text>
         </View>
-        <TouchableOpacity style={styles.item}>
+        <TouchableOpacity style={[styles.item, {width: '100%'}]} onPress={confirmLogout}>
           <Text>Logout</Text>
         </TouchableOpacity>
         <TouchableOpacity style={[styles.item, styles.textDanger]}>
@@ -104,6 +154,8 @@ export default function DashboardScreen({navigation}) {
     </ScrollView>
   );
 }
+
+export default Dashboard;
 
 const styles = StyleSheet.create({
   textDanger: {

@@ -17,23 +17,26 @@ import {
   import AsyncStorage from "@react-native-async-storage/async-storage";
   import { Audio } from 'expo-av';
   import ConfettiCannon from 'react-native-confetti-cannon'
-  
+
   const Login = ({navigation}) => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
     const [showConfetti, setShowConfetti] = useState(false);
     const confettiRef = useRef(null);
+    const confettiRef2 = useRef(null);
 
     const playSound = async () => {
       const sound = new Audio.Sound();
       try{
-        await sound.loadAsync(require('../assets/music/zapsplat_mutimedia_game_sound_simple_basic_marimba_riff_positive_007_97829.mp3'));
+        await sound.loadAsync(require('../assets/music/login_success_sound.mp3'));
         await sound.playAsync();
       }catch (error) {
         console.error('ERROR playing sound: ', error);
       }
     };
+
+
   
     const goToHome = async () => {
       if(username === '' || password === '') {
@@ -58,8 +61,9 @@ import {
             // Kích hoạt hiệu ứng pháo hoa 
             setShowConfetti(true);
             setTimeout(() => {
+                setShowConfetti(false);
                 navigation.navigate('Home', { username });
-            }, 5000);
+            }, 4000);
           } else {
             Alert.alert("🔴 Error",'Username or password not correct!' );
             navigation.navigate('Login1');
@@ -175,7 +179,23 @@ import {
             </View>
           </View>
         </ImageBackground>
-        {showConfetti && ( <ConfettiCannon ref={confettiRef} count={300} origin={{ x: 0, y: 0 }} fadeOut autoStart={true} />)}
+        {showConfetti && ( 
+          <>
+            <ConfettiCannon 
+              ref={confettiRef} 
+              count={150} 
+              origin={{ x: 0, y: 0 }} 
+              fadeOut 
+            />
+
+            <ConfettiCannon 
+              ref={confettiRef2} 
+              count={150} 
+              origin={{ x: screenWidth, y:0 }} 
+              fadeOut 
+            />
+          </>
+          )}
       </View>
     );
   };
