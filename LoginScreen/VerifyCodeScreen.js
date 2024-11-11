@@ -8,19 +8,29 @@ import {
     View,
     Dimensions,
     Keyboard,
+    Alert
   } from "react-native";
   import Checkbox from "expo-checkbox";
-  import React, { useState, useRef } from "react";
+  import React, { useState, useRef, useEffect } from "react";
   import AntIcon from "react-native-vector-icons/AntDesign";
   const screenHeight = Dimensions.get("window").height;
   const screenWidth = Dimensions.get("window").width;
   
-  const Login1 = ({navigation}) => {
+  const Login1 = ({navigation, route}) => {
     const [code, setCode] = useState(['', '', '', '']);
+
+    useEffect(() => {
+      if (code.join("").length === 4) {
+          verifyCode();
+      }
+  }, [code]);
+  
     const input1 = useRef(null);
     const input2 = useRef(null);
     const input3 = useRef(null);
     const input4 = useRef(null);
+
+    const { email } = route.params;
     
 
     const handleChangeText = (text, index) => {
@@ -45,7 +55,6 @@ import {
 
           case 3: 
             Keyboard.dismiss();
-            navigation.navigate('NewPasswordScreen');
             break;
 
           default:
@@ -76,6 +85,40 @@ import {
     const getInputStyle = (index) => {
         return code[index] ? style.inputFilled : style.input;
       };
+
+      const verifyCode = async () => { 
+        
+        const otp = code.join("").toString(); 
+
+        if (otp.length < 4) return;
+
+        console.log(otp)
+
+        try { 
+          const response = await fetch('http://10.10.88.77:3000/verify-otp', 
+            { 
+              method: 'POST', 
+              headers: { 
+                'Content-Type': 'application/json', 
+              }, 
+              body: JSON.stringify({ email, otp }), 
+            }); 
+            
+            const data = await response.json(); 
+            
+            if (response.status === 200) { 
+              navigation.navigate('NewPasswordScreen'); 
+            } else if (response.status === 400) { 
+              Alert.alert('Invalid OTP', data.message); 
+            }
+            else {
+              Alert.alert('Error', 'Failed to verify OTP.');
+            }
+          } catch (error) { 
+            console.error(error);
+            Alert.alert('Error', 'Failed to verify OTP.'); 
+          }
+        };
 
     return (
       <View style={style.container}>
@@ -118,7 +161,7 @@ import {
                   }}
                 >
                   <Text style={style.noticeResetPassword}>
-                    An email has been sent to ton@gmail.com
+                    An email has been sent to {email}
                   </Text>
                   <Text style={[style.noticeResetPassword, { color: "gray" }]}>
                     Enter this verification code on your Email address to confirm
@@ -198,7 +241,7 @@ import {
   
               <View style={style.signUpContainer}>
                 <TouchableOpacity style={{ width: "100%" }}
-                onPress={() => navigation.navigate('NewPasswordScreen')}
+                onPress={verifyCode}
                 >
                   <Text style={[style.textSignUp]}>Verify</Text>
                 </TouchableOpacity>

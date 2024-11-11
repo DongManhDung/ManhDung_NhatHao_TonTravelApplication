@@ -29,14 +29,17 @@ import {
           body: JSON.stringify({ email }),
         });
         
-        if(response.ok){
+        if(response.status == 200){
           Alert.alert("🟢 Success",`Recovery email sent to ${email}!`);
           navigation.navigate('VerifyCodeScreen', { email });
+        }else if(response.status == 404){
+          Alert.alert("🔴 Error",`Cannot find email ${email}!`);
+          navigation.navigate('ResetPassword');
         }
         else{
           Alert.alert("🔴 Error",`Cannot send recovery email to ${email}!`);
           navigation.navigate('ResetPassword');
-        }
+        };
       } catch (error) {
         console.error('ERROR: ', error);
       }

@@ -4,11 +4,12 @@ const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
-// const cors = require('cors');
+const cors = require('cors');
 
 const app = express();
-// app.use(cors());
+
 app.use(bodyParser.json());
+app.use(cors());
 
 // Connect to mariaDB
 const pool = mariadb.createPool({
@@ -118,14 +119,20 @@ const transporter = nodemailer.createTransport({
     service: 'Gmail',
     auth: {
         user: 'tuilaton04072003@gmail.com',
-        pass: 'Dungcon2003',
+        pass: 'mkxc zjdd qnxg ccrk',
     },
 });
+
+let otpStore = {};
 
 // Generate OTP 4 digits number
 const generateOTP = () => {
     return Math.floor(1000 + Math.random() * 9000);
 };
+
+
+//OTP het han sau 5p
+const OTP_EXPIRATION_TIME = 5 * 60 * 1000;
 
 app.post('/recoverPassword', async (req, res) => {
     const {email} = req.body;
@@ -138,17 +145,20 @@ app.post('/recoverPassword', async (req, res) => {
             const otp = generateOTP();
 
             const mailOption = {
-                from: 'TonTravelStaff',
+                from: 'tuilaton04072003@gmail.com',
                 to: email,
                 subject: 'Password Recovery with OTP',
                 text: `Hello! Thanks for using my service. This is your OTP for password recovery is: ${otp}`
             };
 
-            transporter.sendMail(mailOption, (error, info) => {
+            
+
+            await transporter.sendMail(mailOption, (error, info) => {
                 if(error){
                     console.error('ERROR: ', error);
                     res.status(500).send('Cannot send email!');
                 }else{
+                    otpStore[email] = { otp, expiresAt: Date.now() + OTP_EXPIRATION_TIME };
                     res.status(200).send('OTP sent successfully!');
                 }
             });
@@ -161,7 +171,20 @@ app.post('/recoverPassword', async (req, res) => {
     }
 });
 
+app.post('/verify-otp', (req, res) => { 
+    const { email, otp } = req.body; 
+    const storedOtpData = otpStore[email];
 
+    console.log("Received email:", email, "Received OTP:", otp);
+    console.log("Stored OTP Data:", storedOtpData);
+
+    if (storedOtpData && storedOtpData.otp.toString() === otp.toString() && storedOtpData.expiresAt > Date.now()) {
+            delete otpStore[email]; 
+            return res.status(200).json({ message: 'OTP verified successfully' }); 
+        } else { 
+            return res.status(400).json({ message: 'Invalid OTP' });
+        }
+});
 
 // Start server
 const PORT = 3000;
