@@ -107,7 +107,7 @@ import {
             const data = await response.json(); 
             
             if (response.status === 200) { 
-              navigation.navigate('NewPasswordScreen'); 
+              navigation.navigate('NewPasswordScreen', { email }); 
             } else if (response.status === 400) { 
               Alert.alert('Invalid OTP', data.message); 
             }
