@@ -14,6 +14,7 @@ import {
   import AntIcon from "react-native-vector-icons/AntDesign";
   const screenHeight = Dimensions.get("window").height;
   const screenWidth = Dimensions.get("window").width;
+  import { apiRequest } from "../Service/ApiService";
   
   const ResetPassword = ({navigation}) => {
     const [email, setEmail] = useState("");
@@ -21,13 +22,8 @@ import {
 
     const sendRecoveryMail = async () => {
       try {
-        const response = await fetch('http://10.10.88.77:3000/recoverPassword', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ email }),
-        });
+        // 10.10.88.77 /recoverPassword POST email
+        const response = await apiRequest('/recoverPassword', 'POST', { email });
         
         if(response.status == 200){
           Alert.alert("🟢 Success",`Recovery email sent to ${email}!`);

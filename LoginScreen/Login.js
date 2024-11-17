@@ -16,7 +16,8 @@ import {
   import Feather from "react-native-vector-icons/Feather";
   import AsyncStorage from "@react-native-async-storage/async-storage";
   import { Audio } from 'expo-av';
-  import ConfettiCannon from 'react-native-confetti-cannon'
+  import ConfettiCannon from 'react-native-confetti-cannon';
+  import { apiRequest } from "../Service/ApiService";
 
   const Login = ({navigation}) => {
     const [username, setUsername] = useState("");
@@ -45,13 +46,8 @@ import {
       } 
       else{
         try{
-          const response = await fetch('http://10.10.88.77:3000/login', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ username, password }),
-          });
+          // 10.10.88.77 /login POST username, password
+          const response = await apiRequest('/login', 'POST', { username, password });
 
           if(response.ok){
             Alert.alert("🟢 Success",`Login successfully. Welcome ${username}!`);

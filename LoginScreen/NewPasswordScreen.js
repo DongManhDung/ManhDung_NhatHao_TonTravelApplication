@@ -14,6 +14,7 @@ import AntIcon from "react-native-vector-icons/AntDesign";
 const screenHeight = Dimensions.get("window").height;
 const screenWidth = Dimensions.get("window").width;
 import Feather from "react-native-vector-icons/Feather";
+import { apiRequest } from "../Service/ApiService";
 
 const Login1 = ({ navigation, route }) => {
 
@@ -38,12 +39,9 @@ const Login1 = ({ navigation, route }) => {
         { text: "OK", onPress: () => navigation.navigate("NewPasswordScreen", { email }) },
       ]);
     } else {
-      try {
-        const response = await fetch("http://10.10.88.77:3000/changePassword", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, password }),
-        });
+      try { 
+        //10.10.88.77 /changePassword POST email, password
+        const response = await apiRequest('/changePassword', 'POST', { email, password });
   
         const textResponse = await response.text();
         console.log('Response Text:', textResponse);

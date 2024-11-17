@@ -12,19 +12,24 @@ import {
   import Checkbox from "expo-checkbox";
   import React, { useState } from "react";
   import AntIcon from "react-native-vector-icons/AntDesign";
+  import Feather from "react-native-vector-icons/Feather";
+  import { apiRequest } from "../Service/ApiService";
+
   const screenHeight = Dimensions.get("window").height;
   const screenWidth = Dimensions.get("window").width;
+  
   
   const Login1 = ({navigation}) => {
     const [isChecked, setChecked] = useState(false);
     const [fullName, setFullName] = useState("");
     const [password, setPassword] = useState("");
     const [email, setEmail] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
 
 
     const handleSignup = async () => {
-      const regexUsername = /^[a-zA-Z0-9]{1,20}$/;
-      const regexPassword = /^[a-zA-Z0-9]{1,20}$/;
+      const regexUsername = /^[a-zA-Z0-9]{5,20}$/;
+      const regexPassword = /^[a-zA-Z0-9]{5,20}$/;
       const regexEmail = /^[a-zA-Z0-9]+@(gmail|yahoo)\.com$/;
 
       if(setFullName == "" || setPassword == "" || setEmail == "" || isChecked === false){
@@ -32,11 +37,11 @@ import {
         navigation.navigate('SignUp');
       }
       else if (!regexUsername.test(fullName)) {
-          Alert.alert("Username must be contain a-z, A-Z, 0-9, 20 characters max");
+          Alert.alert("Username must be contain a-z, A-Z, 0-9, 5 - 20 characters max");
           navigation.navigate('SignUp');
       }
       else if(!regexPassword.test(password)){
-          Alert.alert("Password must be contain a-z, A-Z, 0-9, 20 characters max");
+          Alert.alert("Password must be contain a-z, A-Z, 0-9, 5 - 20 characters max");
           navigation.navigate('SignUp');
       }
       else if(!regexEmail.test(email)){
@@ -45,17 +50,9 @@ import {
       }
       else{
         try{
-          const response = await fetch('http://10.10.88.76:3000/addUser', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ 
-              fullName, 
-              password, 
-              email, 
-            })
-          });
+          // 10.10.88.77 /addUser POST fullName, password, email 
+          const response = await apiRequest('/addUser', 'POST', { fullName, password, email });
+          
           if(response.ok){
             console.log('User added successfully!');
           } else {
@@ -117,17 +114,13 @@ import {
                   <TextInput
                     placeholder={"Password"}
                     editable
-                    secureTextEntry={true}
+                    secureTextEntry={!showPassword}
                     style={[style.textInput, {width: '80%'}]}
                     value={password}
                     onChangeText={setPassword}
                   ></TextInput>
-                  <TouchableOpacity>
-                    <AntIcon
-                      name="eye"
-                      size={35}
-                      style={{position: 'absolute', right: 0, top: -20}}
-                    ></AntIcon>
+                  <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+                    <Feather name={showPassword ? 'eye-off' : 'eye'} size={35} style={{ position:'absolute',right: 0, top: -25 }}></Feather>
                   </TouchableOpacity>
                 </View>
   

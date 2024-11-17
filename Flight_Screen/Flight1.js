@@ -20,6 +20,7 @@ import moment from 'moment';
 import Modal from 'react-native-modal';
 import { Picker } from '@react-native-picker/picker'
 import Feather from 'react-native-vector-icons/Feather';
+import { apiRequest } from "../Service/ApiService";
 
 const Flight1 = ({navigation, route}) => {
   const [isChecked, setChecked] = useState(false);
@@ -108,20 +109,8 @@ const Flight1 = ({navigation, route}) => {
       const totalPassengers = adultCount + childCount;
       // POST data to server
       try{
-      const response = await fetch('http://10.10.88.77:3000/addFlight', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          text1,
-          text2,
-          selectedDate,
-          adultCount,
-          childCount,
-          seatClass,
-        }),
-      });
+        // 172.20.10.4 /addFlight POST text1, text2, selectedDate, adultCount, childCount, seatClass
+      const response = await apiRequest('/addFlight', 'POST', { text1, text2, selectedDate, adultCount, childCount, seatClass });
 
       if (response.ok) {
         console.log('Flight added successfully!');
@@ -151,9 +140,9 @@ const Flight1 = ({navigation, route}) => {
 
   const getRecentSearches = async () => {
     try {
-      const response = await fetch('http://10.10.88.77:3000/getAllFlights', {
-        method: 'GET',
-      });
+      // 172.20.10.4 /getAllFlights GET
+      const response = await apiRequest('/getAllFlights', 'GET');
+
       const result = await response.json();
       setRecentSearches(result);
     } catch (error) {
@@ -166,9 +155,9 @@ const Flight1 = ({navigation, route}) => {
 
   const handleDelete = async (id) => {
     try { 
-      const response = await fetch(`http://10.10.88.77:3000/deleteFlight/${id}`, { 
-        method: 'DELETE', 
-      });
+      // 172.20.10.4 /deleteFlight/${id} DELETE
+      const response = await apiRequest(`/deleteFlight/${id}`, 'DELETE');
+
       if (response.ok) { 
         Alert.alert("🟢 Success","Flight data deleted successfully!"); 
         setRecentSearches(recentSearches.filter(search => search.id !== id)); ///load lai dâta sau khi xoa

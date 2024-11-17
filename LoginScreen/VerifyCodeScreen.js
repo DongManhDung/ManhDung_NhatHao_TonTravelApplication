@@ -15,6 +15,7 @@ import {
   import AntIcon from "react-native-vector-icons/AntDesign";
   const screenHeight = Dimensions.get("window").height;
   const screenWidth = Dimensions.get("window").width;
+  import { apiRequest } from "../Service/ApiService";
   
   const Login1 = ({navigation, route}) => {
     const [code, setCode] = useState(['', '', '', '']);
@@ -95,14 +96,8 @@ import {
         console.log(otp)
 
         try { 
-          const response = await fetch('http://10.10.88.77:3000/verify-otp', 
-            { 
-              method: 'POST', 
-              headers: { 
-                'Content-Type': 'application/json', 
-              }, 
-              body: JSON.stringify({ email, otp }), 
-            }); 
+          // 10.10.88.77 /verify-otp POST email, otp
+          const response = await apiRequest('/verify-otp', 'POST', { email, otp });
             
             const data = await response.json(); 
             
