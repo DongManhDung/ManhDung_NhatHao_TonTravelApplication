@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import Modal from 'react-native-modal';
 import Countdown from '../Dialog/Countdown';
 
@@ -12,8 +12,9 @@ const SuperPromotionDialog = ({ isVisible, onClose }) => {
   return (
     <Modal isVisible={isVisible} onBackdropPress={onClose}>
       <View style={styles.modalContainer}>
-        <Text style={styles.title}>Happy Single Days 11/11!</Text>
+        <Text style={styles.title}>Happy Single's Day 11/11!</Text>
         <Text style={styles.message}>You are a <Text style={{color: '#088F08'}}>new members</Text> who book any one service will get up to 60% discount on all items! Apply today only!</Text>
+        <Image source={require('../assets/ImgDesign/Dialog/Advertisement single day.jpg')} style={styles.promotionImage} />
         <Countdown targetDate={targetDate} />
         <TouchableOpacity style={styles.button} onPress={onClose}>
           <Text style={styles.buttonText}>Booking now!</Text>
@@ -51,6 +52,12 @@ const styles = StyleSheet.create({
   buttonText: {
     color: 'black',
     fontSize: 16,
+  },
+  promotionImage: { 
+    width: 300, 
+    height: 200, 
+    marginVertical: 10,
+    objectFit: 'fill',
   },
 });
 
