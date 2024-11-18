@@ -1,13 +1,13 @@
 // services/ApiService.js
 // NOTE (important): change the BASE_URL to your local IP address WIFI
-// Cmd - > ipconfig -> look for IPv4 Address
 
-const BASE_URL = 'http://10.10.88.76:3000';
+const BASE_URL = 'http://192.168.0.114:3000';
 
-export const apiRequest = async (endpoint, method = 'GET', body = null) => {
+const apiRequest = async (endpoint, method = 'GET', body = null) => {
   try {
+    console.log(`Request: ${method} ${BASE_URL}${endpoint}`);
     const response = await fetch(`${BASE_URL}${endpoint}`, {
-      method,
+      method, // Sử dụng method được truyền
       headers: {
         'Content-Type': 'application/json',
       },
@@ -25,3 +25,6 @@ export const apiRequest = async (endpoint, method = 'GET', body = null) => {
     throw error;
   }
 };
+
+export default apiRequest;
+

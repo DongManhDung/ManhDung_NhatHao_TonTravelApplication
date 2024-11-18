@@ -14,7 +14,7 @@ import AntIcon from "react-native-vector-icons/AntDesign";
 const screenHeight = Dimensions.get("window").height;
 const screenWidth = Dimensions.get("window").width;
 import Feather from "react-native-vector-icons/Feather";
-import { apiRequest } from "../Service/ApiService";
+import  apiRequest  from "../Service/ApiService";
 
 const Login1 = ({ navigation, route }) => {
 
@@ -43,18 +43,14 @@ const Login1 = ({ navigation, route }) => {
         //10.10.88.77 /changePassword POST email, password
         const response = await apiRequest('/changePassword', 'POST', { email, password });
   
-        const textResponse = await response.text();
-        console.log('Response Text:', textResponse);
-  
         // Thử phân tích cú pháp JSON
         try {
-          const data = JSON.parse(textResponse);
-          if (response.status === 200) {
+          if (response.success) {
             Alert.alert("🟢 Success", "Password updated successfully.", [
               { text: "OK", onPress: () => navigation.navigate("NoticePasswordChanged") },
             ]);
           } else {
-            Alert.alert("Error", data.message || "Unexpected response format.");
+            Alert.alert("Error", "Failed to update password.");
           }
         } catch (parseError) {
           console.error('JSON Parse Error:', parseError);

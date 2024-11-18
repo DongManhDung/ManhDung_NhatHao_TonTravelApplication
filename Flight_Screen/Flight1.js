@@ -13,14 +13,12 @@ import {
 import Checkbox from "expo-checkbox";
 import AntIcon from "react-native-vector-icons/AntDesign";
 import FontIsto from "react-native-vector-icons/Fontisto";
-const screenHeight = Dimensions.get("window").height;
-const screenWidth = Dimensions.get("window").width;
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import moment from 'moment';
 import Modal from 'react-native-modal';
 import { Picker } from '@react-native-picker/picker'
 import Feather from 'react-native-vector-icons/Feather';
-import { apiRequest } from "../Service/ApiService";
+import  apiRequest  from "../Service/ApiService";
 
 const Flight1 = ({navigation, route}) => {
   const [isChecked, setChecked] = useState(false);
@@ -112,7 +110,7 @@ const Flight1 = ({navigation, route}) => {
         // 172.20.10.4 /addFlight POST text1, text2, selectedDate, adultCount, childCount, seatClass
       const response = await apiRequest('/addFlight', 'POST', { text1, text2, selectedDate, adultCount, childCount, seatClass });
 
-      if (response.ok) {
+      if (response.success) {
         console.log('Flight added successfully!');
       }
       else {
@@ -142,9 +140,8 @@ const Flight1 = ({navigation, route}) => {
     try {
       // 172.20.10.4 /getAllFlights GET
       const response = await apiRequest('/getAllFlights', 'GET');
-
-      const result = await response.json();
-      setRecentSearches(result);
+      console.log('API Response:', response);  // Log kết quả để kiểm tra
+      setRecentSearches(response);
     } catch (error) {
       console.error('ERROR fetching recent searches: ', error);
     }
@@ -158,7 +155,7 @@ const Flight1 = ({navigation, route}) => {
       // 172.20.10.4 /deleteFlight/${id} DELETE
       const response = await apiRequest(`/deleteFlight/${id}`, 'DELETE');
 
-      if (response.ok) { 
+      if (response.success) { 
         Alert.alert("🟢 Success","Flight data deleted successfully!"); 
         setRecentSearches(recentSearches.filter(search => search.id !== id)); ///load lai dâta sau khi xoa
       } else { 
@@ -691,8 +688,8 @@ const style = StyleSheet.create({
     width: '100%', 
     height: 200, 
     backgroundColor: '#90e0ef', 
-    borderTopStartRadius: '50%', 
-    borderBottomEndRadius: '50%', 
+    borderTopStartRadius: 50, 
+    borderBottomEndRadius: 50,
     justifyContent: 'center', 
     paddingHorizontal: 15,
     rowGap: 10

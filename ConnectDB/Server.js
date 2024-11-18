@@ -36,10 +36,10 @@ app.post("/addFlight", async (req, res) => {
       [text1, text2, selectedDate, adultCount, childCount, seatClass]
     );
     conn.release();
-    res.status(200).send("Flight added successfully!");
+    res.status(200).json({ success: true, message: "Flight added successfully!" });
   } catch (error) {
     console.error("ERROR: ", error);
-    res.status(500).send("Cannot add a flight!");
+    res.status(500).json({ success: false, message: "Cannot add a flight!" });
   }
 });
 
@@ -49,12 +49,17 @@ app.get("/getAllFlights", async (req, res) => {
     const conn = await pool.getConnection();
     const rows = await conn.query("SELECT * FROM flight_searches");
     conn.release();
-    res.json(rows);
+    
+    // Log dữ liệu để kiểm tra
+    console.log('Flights Data:', rows);
+    
+    res.json(rows);  // Trả về dữ liệu dưới dạng JSON
   } catch (error) {
     console.error(error);
-    res.status(500).send("Failed to retrieve flight data");
+    res.status(500).json({ success: false, message: "Failed to retrieve flight data" });
   }
 });
+
 
 //Delete
 app.delete("/deleteFlight/:id", async (req, res) => {
@@ -63,10 +68,10 @@ app.delete("/deleteFlight/:id", async (req, res) => {
     const conn = await pool.getConnection();
     await conn.query("DELETE FROM flight_searches WHERE id = ?", [id]);
     conn.release();
-    res.status(200).send("Flight data deleted successfully");
+    res.status(200).json({ success: true, message: "Flight data deleted successfully" });
   } catch (error) {
     console.error(error);
-    res.status(500).send("Failed to delete flight data");
+    res.status(500).json({ success: false, message: "Failed to delete flight data" });
   }
 });
 
@@ -81,10 +86,10 @@ app.post("/addUser", async (req, res) => {
       [fullName, password, email]
     );
     conn.release();
-    res.status(200).send("User added successfully!");
+    res.status(200).json({ success: true, message: "User added successfully!" });
   } catch (error) {
     console.error("ERROR: ", error);
-    res.status(500).send("Cannot add a user!");
+    res.status(500).json({ success: false, message: "Cannot add a user!" });
   }
 });
 
@@ -101,18 +106,19 @@ app.post("/login", async (req, res) => {
     if (rows.length > 0) {
       const user = rows[0];
       if (password === user.password) {
-        res.status(200).send("Login successfully!");
+        res.status(200).json({ success: true, message: "Login successfully!" });
       } else {
-        res.status(401).send("Username or password not correct!");
+        res.status(401).json({ success: false, message: "Username or password not correct!" });
       }
     } else {
-      res.status(401).send("Username or password not correct!");
+      res.status(401).json({ success: false, message: "Username or password not correct!" });
     }
   } catch (error) {
     console.error(error);
-    res.status(500).send("Failed to login");
+    res.status(500).json({ success: false, message: "Failed to login" });
   }
 });
+
 
 // Backend xu ly quen mat khau
 // POST email recover password after press button
@@ -156,21 +162,21 @@ app.post("/recoverPassword", async (req, res) => {
       await transporter.sendMail(mailOption, (error, info) => {
         if (error) {
           console.error("ERROR: ", error);
-          res.status(500).send("Cannot send email!");
+          res.status(500).json({ success: false, message: "Cannot send email!" });
         } else {
           otpStore[email] = {
             otp,
             expiresAt: Date.now() + OTP_EXPIRATION_TIME,
           };
-          res.status(200).send("OTP sent successfully!");
+          res.status(200).json({ success: true, message: "OTP sent successfully!" });
         }
       });
     } else {
-      res.status(404).send("Email not found!");
+      res.status(404).json({ success: false, message: "Email not found!" });
     }
   } catch (error) {
     console.error("ERROR: ", error);
-    res.status(500).send("Cannot recover password!");
+    res.status(500).json({ success: false, message: "Cannot recover password!" });
   }
 });
 
@@ -187,9 +193,9 @@ app.post("/verify-otp", (req, res) => {
     storedOtpData.expiresAt > Date.now()
   ) {
     delete otpStore[email];
-    return res.status(200).json({ message: "OTP verified successfully" });
+    return res.status(200).json({ success: true, message: "OTP verified successfully" });
   } else {
-    return res.status(400).json({ message: "Invalid OTP" });
+    return res.status(400).json({ success: false, message: "Invalid OTP" });
   }
 });
 
@@ -204,18 +210,18 @@ app.post("/changePassword", async (req, res) => {
     );
     conn.release();
     if (rows.affectedRows > 0) {
-      res.status(200).json({ message: "Password updated successfully" });
+      res.status(200).json({success: true, message: "Password updated successfully" });
     } else {
-      res.status(404).json({ message: "Email not found" });
+      res.status(404).json({success: false, message: "Failed to update password" });
     }
   } catch (error) {
     console.error("Error: ", error);
-    res.status(500).json({ message: "Failed to update password" });
+    res.status(500).json({success: false, message: "Failed to update password" });
   }
 });
 
 // Start server
 const PORT = 3000;
-app.listen(PORT, () => {
-  console.log(`Server is running at http://localhost: ${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Server is running on http://0.0.0.0:${PORT}`);
 });
