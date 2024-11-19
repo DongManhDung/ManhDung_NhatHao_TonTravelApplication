@@ -183,7 +183,8 @@ import {
   const style = StyleSheet.create({
     obContainer: {
       width: "100%",
-      height: 850,
+      flex: 1, 
+      flexDirection: 'column',
     },
     obHeader: {
       width: "100%",
