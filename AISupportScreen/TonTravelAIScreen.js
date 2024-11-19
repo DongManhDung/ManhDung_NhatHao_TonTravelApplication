@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from "react";
 import {
   View,
   Text,
@@ -15,15 +15,15 @@ import {
   Keyboard,
   ScrollView,
   Modal,
-} from 'react-native';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import data from './Data'; // Import dữ liệu từ file data.js
-import listCategories from './ListCategories.json';
-import levenshtein from 'fast-levenshtein'; // Sử dụng thư viện Levenshtein để so khớp chuỗi
-import MenuAnimation  from './MenuAnimation';
+} from "react-native";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import data from "./Data"; // Import dữ liệu từ file data.js
+import listCategories from "./ListCategories.json";
+import stringSimilarity from "string-similarity"; // Sử dụng thư viện string-similarity để so khớp chuỗi
+import MenuAnimation from "./MenuAnimation";
 
 if (
-  Platform.OS === 'android' &&
+  Platform.OS === "android" &&
   UIManager.setLayoutAnimationEnabledExperimental
 ) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -31,7 +31,7 @@ if (
 
 const App = () => {
   const [messages, setMessages] = useState([]); // Danh sách tin nhắn
-  const [input, setInput] = useState(''); // Nội dung nhập
+  const [input, setInput] = useState(""); // Nội dung nhập
   const [isLoading, setIsLoading] = useState(false); // Đang xử lý
   const [showIntro, setShowIntro] = useState(true); // Hiển thị phần intro
   const [renderedBotMessages, setRenderedBotMessages] = useState(new Set()); // Theo dõi các tin nhắn bot đã được render
@@ -76,11 +76,11 @@ const App = () => {
     };
 
     const keyboardShowListener = Keyboard.addListener(
-      'keyboardDidShow',
+      "keyboardDidShow",
       onKeyboardShow
     );
     const keyboardHideListener = Keyboard.addListener(
-      'keyboardDidHide',
+      "keyboardDidHide",
       onKeyboardHide
     );
 
@@ -97,10 +97,10 @@ const App = () => {
 
   // Data suggestion
   const suggestions = [
-    { id: '1', text: 'Xin chào 😘' },
-    { id: '2', text: 'Cảm ơn' },
-    { id: '3', text: 'Tạm biệt' },
-    { id: '4', text: 'Giúp tôi với' },
+    { id: "1", text: "Xin chào 😘" },
+    { id: "2", text: "Cảm ơn" },
+    { id: "3", text: "Tạm biệt" },
+    { id: "4", text: "Giúp tôi với" },
   ];
 
   // Hàm bắt đầu chat
@@ -108,72 +108,90 @@ const App = () => {
     setShowIntro(false);
     const initialBotMessage = {
       id: Date.now().toString(),
-      text: 'Chào mừng bạn đến với TonTravel, mình có thể giúp gì cho bạn?',
-      sender: 'bot',
+      text: "Chào mừng bạn đến với TonTravel, mình có thể giúp gì cho bạn?",
+      sender: "bot",
     };
     setMessages([initialBotMessage]); // Khởi tạo tin nhắn đầu tiên
     setShowSuggestions(true); // Hiển thị gợi ý khi bắt đầu chat
   };
 
+  //Vét cạn dữ liệu để tìm câu trả lời tốt nhất
+  // Hàm tiền xử lý văn bản
+  const preprocessText = (text) => {
+    return text
+      .toLowerCase()
+      .replace(/[^a-z0-9\s]/g, "")
+      .trim(); // Chuyển chữ thường, loại ký tự đặc biệt
+  };
+
+  // Tiền xử lý dữ liệu câu hỏi từ file JSON
+  const processedData = data.map(({ user, bot }) => ({
+    user: preprocessText(user),
+    bot,
+  }));
+
+  // Hàm tìm câu trả lời tốt nhất
+  const findBestMatch = (inputText) => {
+    const processedInput = preprocessText(inputText);
+
+    const userSentences = processedData.map((item) => item.user);
+    const match = stringSimilarity.findBestMatch(processedInput, userSentences);
+
+    if (match.bestMatch.rating >= 0.35) {
+      const bestIndex = match.bestMatchIndex;
+      return processedData[bestIndex];
+    }
+    return null;
+  };
+
   // Hàm gửi tin nhắn
   const sendMessage = async (messageText) => {
-    const text = messageText || input.trim();
-    if (!text) return; // Bỏ qua nếu không có nội dung
-
+    const text = messageText.trim();
+    if (!text) return;
+  
     const userMessage = {
       id: Date.now().toString(),
-      text: text,
+      text,
       sender: 'user',
     };
-
-    // Cập nhật tin nhắn người dùng
+  
     setMessages((prevMessages) => [...prevMessages, userMessage]);
-    setInput(''); // Xóa nội dung nhập
-    setIsLoading(true); // Hiển thị loading
-    setIsBotDone(false); // Khóa các button gợi ý khi bắt đầu gửi tin nhắn
-    setShowSuggestions(false); // Tắt hiển thị gợi ý sau khi người dùng chọn
-
-    // Kiểm tra câu trả lời tự động dựa trên dữ liệu có sẵn
-    const match = data.find(
-      (d) =>
-        levenshtein.get(text.toLowerCase(), d.user.toLowerCase()) <=
-        d.user.length * 0.65
-    );
-
+    setInput('');
+    setIsLoading(true);
+  
+    // Tìm câu trả lời dựa trên file dữ liệu
+    const match = findBestMatch(text);
     if (match) {
-      const newBotMessage = {
+      const botMessage = {
         id: Date.now().toString(),
         text: match.bot,
         sender: 'bot',
       };
-
-      // Cập nhật tin nhắn bot
-      setMessages((prevMessages) => [...prevMessages, newBotMessage]);
-      setIsLoading(false); // Tắt loading
+  
+      setMessages((prevMessages) => [...prevMessages, botMessage]);
+      setIsLoading(false);
     } else {
-      // Nếu không có câu trả lời tự động, giả lập API trả lời
       setTimeout(() => {
-        const newBotMessage = {
+        const botMessage = {
           id: Date.now().toString(),
-          text: 'Cảm ơn bạn đã gửi tin nhắn. Mình có thể giúp gì thêm không?',
+          text: 'Xin lỗi, mình chưa hiểu ý bạn lắm 😵‍💫. Mình có thể giúp gì thêm không?',
           sender: 'bot',
         };
-
-        // Cập nhật tin nhắn bot
-        setMessages((prevMessages) => [...prevMessages, newBotMessage]);
-        setIsLoading(false); // Tắt loading
+  
+        setMessages((prevMessages) => [...prevMessages, botMessage]);
+        setIsLoading(false);
       }, 1000);
     }
   };
 
   // Hàm để render tin nhắn bot với hiệu ứng
   const AnimatedMessage = ({ text, style, onEnd }) => {
-    const [showText, setShowText] = useState('');
+    const [showText, setShowText] = useState("");
     const animationValue = useRef(new Animated.Value(0)).current;
 
     useEffect(() => {
       if (text) {
-        setShowText(''); // Đặt lại văn bản hiển thị trước khi bắt đầu
+        setShowText(""); // Đặt lại văn bản hiển thị trước khi bắt đầu
 
         // Tổng thời gian hiệu ứng dựa trên độ dài văn bản
         const baseDuration = 1000; // Thời gian tối thiểu (ms)
@@ -198,7 +216,7 @@ const App = () => {
         const chars = Array.from(text); // Sử dụng Array.from để xử lý ký tự Unicode
         animationValue.addListener(({ value }) => {
           const numCharsToShow = Math.floor(value * chars.length);
-          setShowText(chars.slice(0, numCharsToShow).join(''));
+          setShowText(chars.slice(0, numCharsToShow).join(""));
         });
 
         // Dọn dẹp listener
@@ -218,11 +236,11 @@ const App = () => {
   // Hàm render tin nhắn
   const renderMessage = ({ item }) => {
     const messageStyle =
-      item.sender === 'user' ? styles.userMessage : styles.botMessage;
+      item.sender === "user" ? styles.userMessage : styles.botMessage;
 
-    const messageText = item.text || '';
+    const messageText = item.text || "";
 
-    if (item.sender === 'bot' && !renderedBotMessages.has(item.id)) {
+    if (item.sender === "bot" && !renderedBotMessages.has(item.id)) {
       return (
         <AnimatedMessage
           text={messageText}
@@ -244,15 +262,17 @@ const App = () => {
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    >
       {showIntro ? (
         <View style={styles.introContainer}>
           <Image
-            source={require('../assets/ImgDesign/AISupportScreen/Yuta.png')}
+            source={require("../assets/ImgDesign/AISupportScreen/Yuta.png")}
             style={styles.logo}
           />
           <Text style={styles.introText}>
-            Xin chào, mình là Yuta, siêu AI đến từ TonTravel đồng hành cùng bạn đây!
+            Xin chào, mình là Yuta, siêu AI đến từ TonTravel đồng hành cùng bạn
+            đây!
           </Text>
           <TouchableOpacity style={styles.startButton} onPress={startChat}>
             <Text style={styles.startButtonText}>Bắt đầu thôi !</Text>
@@ -287,21 +307,25 @@ const App = () => {
                     { opacity: isBotDone ? 1 : 0.5 },
                   ]}
                   onPress={() => sendMessage(item.text)}
-                  disabled={!isBotDone}>
+                  disabled={!isBotDone}
+                >
                   <Text style={styles.suggestionText}>{item.text}</Text>
                 </TouchableOpacity>
               )}
               contentContainerStyle={styles.suggestionContainer}
               numColumns={2}
-              style={{ maxHeight: '25%' }}
+              style={{ maxHeight: "25%" }}
               keyboardShouldPersistTaps="handled"
             />
           )}
-          <View style={[styles.inputArea, { paddingBottom: keyboardHeight * 0.22}]}>
+          <View
+            style={[styles.inputArea, { paddingBottom: keyboardHeight * 0.22 }]}
+          >
             {/* Icon để mở dialog */}
             <TouchableOpacity
               onPress={() => setIsModalVisible(true)}
-              style={{ marginRight: 10 }}>
+              style={{ marginRight: 10 }}
+            >
               <MenuAnimation onPress={() => setIsModalVisible(true)} />
             </TouchableOpacity>
 
@@ -320,7 +344,8 @@ const App = () => {
             <TouchableOpacity
               style={styles.sendButton}
               onPress={() => sendMessage(input)}
-              disabled={!isBotDone}>
+              disabled={!isBotDone}
+            >
               <MaterialCommunityIcons
                 name="send-circle-outline"
                 size={30}
@@ -333,7 +358,8 @@ const App = () => {
           <Modal
             visible={isModalVisible}
             animationType="slide"
-            transparent={true}>
+            transparent={true}
+          >
             <View style={styles.modalOverlay}>
               <View style={styles.modalContainer}>
                 <Text style={styles.modalTitle}>Chọn một Category:</Text>
@@ -341,19 +367,22 @@ const App = () => {
                 <ScrollView
                   horizontal
                   showsHorizontalScrollIndicator={false}
-                  contentContainerStyle={styles.scrollContainer}>
+                  contentContainerStyle={styles.scrollContainer}
+                >
                   {Object.keys(listCategories).map((item) => (
                     <TouchableOpacity
                       key={item}
                       style={styles.horizontalButton}
-                      onPress={() => handleCategorySelect(item)}>
+                      onPress={() => handleCategorySelect(item)}
+                    >
                       <Text style={styles.buttonText}>{item}</Text>
                     </TouchableOpacity>
                   ))}
                 </ScrollView>
                 <TouchableOpacity
                   style={styles.closeModalButton}
-                  onPress={() => setIsModalVisible(false)}>
+                  onPress={() => setIsModalVisible(false)}
+                >
                   <Text style={styles.closeModalText}>Đóng</Text>
                 </TouchableOpacity>
               </View>
@@ -370,7 +399,8 @@ const App = () => {
                   onPress={() => {
                     sendMessage(item);
                     setCategoryQuestions([]);
-                  }}>
+                  }}
+                >
                   <Text style={styles.categoryQuestionText}>{item}</Text>
                 </TouchableOpacity>
               )}
@@ -383,60 +413,59 @@ const App = () => {
   );
 };
 
-
 const styles = StyleSheet.create({
   chatArea: {
     flex: 1,
     padding: 10,
     paddingBottom: 20,
-    backgroundColor: '#F5FDFF',
+    backgroundColor: "#F5FDFF",
   },
   message: {
     marginVertical: 15,
     padding: 10,
     borderRadius: 10,
-    maxWidth: '75%',
+    maxWidth: "75%",
   },
-  userMessage: { alignSelf: 'flex-end', backgroundColor: '#007AFF' },
-  botMessage: { alignSelf: 'flex-start', backgroundColor: '#E5E5EA' },
-  messageText: { color: '#000' },
+  userMessage: { alignSelf: "flex-end", backgroundColor: "#007AFF" },
+  botMessage: { alignSelf: "flex-start", backgroundColor: "#E5E5EA" },
+  messageText: { color: "#000" },
   suggestionContainer: {
-    justifyContent: 'center',
+    justifyContent: "center",
     paddingHorizontal: 10,
     paddingVertical: 5,
   },
   suggestionButton: {
-    backgroundColor: '#E5E5EA',
+    backgroundColor: "#E5E5EA",
     borderRadius: 5,
     paddingHorizontal: 15,
     paddingVertical: 10,
     margin: 10,
-    flexBasis: '45%',
-    alignItems: 'center',
+    flexBasis: "45%",
+    alignItems: "center",
     height: 150,
   },
   suggestionText: {
-    color: '#000',
+    color: "#000",
   },
   inputArea: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     padding: 10,
     borderTopWidth: 1,
-    borderColor: '#DDD',
-    marginBottom: 25
+    borderColor: "#DDD",
+    marginBottom: 25,
   },
   input: {
     flex: 1,
     height: 50,
-    borderColor: '#CCC',
+    borderColor: "#CCC",
     borderWidth: 1,
     borderRadius: 5,
     paddingHorizontal: 10,
   },
   sendButton: {
     marginLeft: 10,
-    backgroundColor: '#007AFF',
+    backgroundColor: "#007AFF",
     borderRadius: 5,
     paddingHorizontal: 15,
     paddingVertical: 10,
@@ -444,27 +473,27 @@ const styles = StyleSheet.create({
   loading: { marginVertical: 10 },
   introContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5F5F5',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#F5F5F5",
     paddingTop: 30,
   },
   logo: { width: 150, height: 150, borderRadius: 75, marginBottom: 20 },
   introText: {
     fontSize: 18,
-    textAlign: 'center',
+    textAlign: "center",
     marginBottom: 20,
-    paddingTop: Platform.OS === 'ios' ? 20 : 0,
+    paddingTop: Platform.OS === "ios" ? 20 : 0,
     padding: 10,
-    columnGap: 10
+    columnGap: 10,
   },
   startButton: {
-    backgroundColor: '#007AFF',
+    backgroundColor: "#007AFF",
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 5,
   },
-  startButtonText: { color: '#FFF', fontSize: 16, fontWeight: 'bold' },
+  startButtonText: { color: "#FFF", fontSize: 16, fontWeight: "bold" },
   categoryQuestionsContainer: {
     marginVertical: 10,
     paddingHorizontal: 15,
@@ -472,57 +501,57 @@ const styles = StyleSheet.create({
   categoryQuestionButton: {
     padding: 10,
     marginVertical: 5,
-    backgroundColor: '#f0f0f0',
+    backgroundColor: "#f0f0f0",
     borderRadius: 5,
   },
   categoryQuestionText: {
     fontSize: 16,
-    color: '#333',
+    color: "#333",
   },
   modalOverlay: {
     flex: 1,
-    justifyContent: 'center', 
-    alignItems: 'center', 
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', 
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   modalContainer: {
-    width: '90%',
-    maxHeight: '50%',
-    backgroundColor: 'white',
+    width: "90%",
+    maxHeight: "50%",
+    backgroundColor: "white",
     borderRadius: 10,
     padding: 15,
-    alignItems: 'center', 
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   modalTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 10,
-    textAlign: 'center', 
+    textAlign: "center",
   },
   closeModalButton: {
     marginTop: 10,
     paddingVertical: 10,
     paddingHorizontal: 20,
-    backgroundColor: '#ff5c5c',
+    backgroundColor: "#ff5c5c",
     borderRadius: 5,
   },
   closeModalText: {
-    color: 'white',
-    fontWeight: 'bold',
-    textAlign: 'center',
+    color: "white",
+    fontWeight: "bold",
+    textAlign: "center",
   },
   scrollContainer: {
-    flexDirection: 'row', 
-    alignItems: 'center',
-    justifyContent: 'flex-start',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-start",
   },
   horizontalButton: {
     paddingVertical: 10,
     paddingHorizontal: 20,
-    backgroundColor: '#007AFF',
+    backgroundColor: "#007AFF",
     borderRadius: 5,
-    marginHorizontal: 5, 
+    marginHorizontal: 5,
   },
 });
 
