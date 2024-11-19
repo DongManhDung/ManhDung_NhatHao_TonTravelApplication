@@ -1,7 +1,7 @@
 // services/ApiService.js
-// NOTE (important): change the BASE_URL to your local IP address WIFI
+// NOTE (important): change the BASE_URL below to your local IPV4 address WIFI
 
-const BASE_URL = 'http://192.168.0.114:3000';
+const BASE_URL = 'http://10.10.88.77:3000';
 
 const apiRequest = async (endpoint, method = 'GET', body = null) => {
   try {

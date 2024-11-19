@@ -1,30 +1,25 @@
 {
-    "Chào hỏi": [
-      "Xin chào! Bạn khỏe không?"
-    ],
-    "Lời cảm ơn": [
-      "Cảm ơn bạn rất nhiều!"
-    ],
-    "Tạm biệt": [
-      "Chúc bạn một ngày tốt lành!"
-    ],
-    "Chuyến bay": [
-        
-    ],
-    "Khách sạn": [
-
-    ],
-    "Tour": [
-
-    ],
-    "Tài khoản": [
-
-    ],
-    "Bảo mật": [
-
-    ],
-    "Quyền lợi": [
-        
-    ]
-  }
-  
+  "Chuyến bay": [
+    "Làm sao để tìm vé giá rẻ?",
+    "Tôi có thể đặt vé cho nhiều người không?",
+    "Làm sao để đặt vé khứ hồi?",
+    "Tôi có thể đặt vé cho nhiều người không?"
+  ],
+  "Tài khoản": [
+    "Tôi không nhớ mật khẩu",
+    "Không thể đăng nhập vào tài khoản"
+  ],
+  "Bảo mật": [
+    "Thông tin thanh toán có an toàn không?"
+  ],
+  "Quyền lợi": [
+    "Quyền lợi khi trở thành T-member là gì?"
+  ],
+  "Hỗ trợ":[
+    "Tôi muốn liên hệ với tổng đài hỗ trợ",
+    "Ứng dụng có hỗ trợ ngôn ngữ khác không?"
+  ],
+  "Thanh toán":[
+    "Tôi có thể thanh toán bằng những phương thức nào?"
+  ]
+}

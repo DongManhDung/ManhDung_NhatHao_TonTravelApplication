@@ -3,13 +3,15 @@ import AntIcon from "react-native-vector-icons/AntDesign";
 import { View, StyleSheet, Text, TextInput, TouchableOpacity, Image, ScrollView } from "react-native";
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { NavigationContainer } from '@react-navigation/native';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Promotion from "./Promotion";
 import MySaved from "./MySaved";
 import Dashboard from "./Dashboard.js";
 import { Audio } from 'expo-av';
 import SuperPromotionDialog from "../Dialog/SuperPromotionDialog";
+import TonTravelAIScreen from "../AISupportScreen/TonTravelAIScreen.js";
+import Entypo from 'react-native-vector-icons/Entypo';
+import CustomHeader from "../AISupportScreen/CustomHeader.js";
 
 const Tab = createBottomTabNavigator();
 
@@ -207,6 +209,14 @@ const Home = ({navigation}) => {
                         >
                         </Tab.Screen>
 
+                        <Tab.Screen name="TonTravelAIScreen" component={TonTravelAIScreen} options={{tabBarLabel: 'Yuta AI', tabBarIcon: ({color}) =>
+                            (<Entypo name="baidu" color={color} size={35} ></Entypo>), headerShown: true,
+                        header: () => <CustomHeader />}}
+                        listeners={{tabPress: handleTabPress}}  
+                        
+                        > 
+                        </Tab.Screen>
+
                         <Tab.Screen name="Dashboard" component={Dashboard} options={{tabBarLabel: 'More', tabBarIcon: ({color}) =>
                             (<MaterialCommunityIcons name="account-circle-outline" color={color} size={35}/>),}}
                         listeners={{tabPress: handleTabPress}}  
@@ -235,7 +245,7 @@ const style = StyleSheet.create({
     },
     miniLogoLeft: {
         width: '100%',
-        height: '25%',
+        height: '35%',
         objectFit: "cover",
     },
     icon4040: {
@@ -272,7 +282,7 @@ const style = StyleSheet.create({
     },
     imgHeaderContainer: {
         width: "100%",
-        height: 200,
+        height: 250,
     },
     emptyGroup: {
         width: "100%",
@@ -283,7 +293,7 @@ const style = StyleSheet.create({
       },
     greetingUserContainer: {
         width: "100%",
-        height: 200,
+        height: 250,
         position: "absolute",
         justifyContent: "center",
         alignItems: "center",

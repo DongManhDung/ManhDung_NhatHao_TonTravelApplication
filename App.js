@@ -52,6 +52,10 @@ import HotelScreen2 from './HotelScreen/HotelScreen2.js';
 import BestLocationScreen1 from './Tour_ActivityScreen/BestLocationScreen1.js';
 import DetailLocationScreen from './Tour_ActivityScreen/DetailLocationScreen.js';
 
+//AI Screen
+import TonTravelAIScreen from './AISupportScreen/TonTravelAIScreen.js';
+import CustomHeader from './AISupportScreen/CustomHeader.js';
+
 export default function App() {
   return (
     <NavigationContainer initialRouteName="OnBoarding">
@@ -94,6 +98,9 @@ export default function App() {
             {/* Tour Screen + Activity Screen */}
             <Stack.Screen name='BestLocationScreen1' component={BestLocationScreen1}></Stack.Screen>
             <Stack.Screen name='DetailLocationScreen' component={DetailLocationScreen}></Stack.Screen>
+
+            {/* AI Screen */}
+            <Stack.Screen name='TonTravelAIScreen' component={TonTravelAIScreen}></Stack.Screen>
 
 
         </Stack.Navigator>

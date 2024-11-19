@@ -11,15 +11,16 @@ import {
   Animated,
   Image,
   Platform,
-  Dimensions,
   UIManager,
   Keyboard,
-  LayoutAnimation,
   ScrollView,
+  Modal,
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import data from './Data'; // Import dữ liệu từ file data.js
+import listCategories from './ListCategories.json';
 import levenshtein from 'fast-levenshtein'; // Sử dụng thư viện Levenshtein để so khớp chuỗi
+import MenuAnimation  from './MenuAnimation';
 
 if (
   Platform.OS === 'android' &&
@@ -28,7 +29,7 @@ if (
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-const TonTravelAIScreen = () => {
+const App = () => {
   const [messages, setMessages] = useState([]); // Danh sách tin nhắn
   const [input, setInput] = useState(''); // Nội dung nhập
   const [isLoading, setIsLoading] = useState(false); // Đang xử lý
@@ -37,7 +38,22 @@ const TonTravelAIScreen = () => {
   const [isBotDone, setIsBotDone] = useState(false); // Khi bot render xong mới cho phép bấm các suggestions
   const [showSuggestions, setShowSuggestions] = useState(true); // Thêm state để điều khiển hiển thị gợi ý
   const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [categoryQuestions, setCategoryQuestions] = useState([]);
   const flatListRef = useRef(null);
+
+  const getCategoryQuestions = (category) => {
+    return listCategories[category] || [];
+  };
+
+  // Câu hỏi theo category từ file JSON
+  const handleCategorySelect = (category) => {
+    setSelectedCategory(category);
+    const questions = listCategories[category] || [];
+    setCategoryQuestions(questions); // Cập nhật danh sách câu hỏi khi chọn category
+    setIsModalVisible(false); // Đóng modal
+  };
 
   // Scroll to the end of FlatList
   const scrollToEnd = () => {
@@ -92,7 +108,7 @@ const TonTravelAIScreen = () => {
     setShowIntro(false);
     const initialBotMessage = {
       id: Date.now().toString(),
-      text: 'Chào mừng bạn đến với siêu AI, mình có thể giúp gì cho bạn?',
+      text: 'Chào mừng bạn đến với TonTravel, mình có thể giúp gì cho bạn?',
       sender: 'bot',
     };
     setMessages([initialBotMessage]); // Khởi tạo tin nhắn đầu tiên
@@ -121,7 +137,7 @@ const TonTravelAIScreen = () => {
     const match = data.find(
       (d) =>
         levenshtein.get(text.toLowerCase(), d.user.toLowerCase()) <=
-        d.user.length * 0.85
+        d.user.length * 0.65
     );
 
     if (match) {
@@ -232,14 +248,14 @@ const TonTravelAIScreen = () => {
       {showIntro ? (
         <View style={styles.introContainer}>
           <Image
-            source={{ uri: 'https://via.placeholder.com/150' }}
+            source={require('../assets/ImgDesign/AISupportScreen/Yuta.png')}
             style={styles.logo}
           />
           <Text style={styles.introText}>
-            Xin chào, mình là siêu AI đồng hành cùng bạn!
+            Xin chào, mình là Yuta, siêu AI đến từ TonTravel đồng hành cùng bạn đây!
           </Text>
           <TouchableOpacity style={styles.startButton} onPress={startChat}>
-            <Text style={styles.startButtonText}>Bắt đầu</Text>
+            <Text style={styles.startButtonText}>Bắt đầu thôi !</Text>
           </TouchableOpacity>
         </View>
       ) : (
@@ -250,7 +266,6 @@ const TonTravelAIScreen = () => {
             keyExtractor={(item) => item.id}
             renderItem={renderMessage}
             style={styles.chatArea}
-            contentContainerStyle={{ paddingTop: 30 }}
             onContentSizeChange={scrollToEnd}
           />
           {isLoading && (
@@ -260,6 +275,7 @@ const TonTravelAIScreen = () => {
               style={styles.loading}
             />
           )}
+
           {showSuggestions && (
             <FlatList
               data={suggestions}
@@ -281,12 +297,20 @@ const TonTravelAIScreen = () => {
               keyboardShouldPersistTaps="handled"
             />
           )}
-          <View style={styles.inputArea}>
+          <View style={[styles.inputArea, { paddingBottom: keyboardHeight * 0.22}]}>
+            {/* Icon để mở dialog */}
+            <TouchableOpacity
+              onPress={() => setIsModalVisible(true)}
+              style={{ marginRight: 10 }}>
+              <MenuAnimation onPress={() => setIsModalVisible(true)} />
+            </TouchableOpacity>
+
+            {/* Input Text */}
             <TextInput
               style={styles.input}
               value={input}
               onChangeText={setInput}
-              placeholder="Nhập nội dung..."
+              placeholder="Import content here..."
               autoCorrect={false}
               onFocus={() =>
                 flatListRef.current.scrollToEnd({ animated: true })
@@ -304,13 +328,61 @@ const TonTravelAIScreen = () => {
               />
             </TouchableOpacity>
           </View>
+
+          {/* Modal hiển thị category */}
+          <Modal
+            visible={isModalVisible}
+            animationType="slide"
+            transparent={true}>
+            <View style={styles.modalOverlay}>
+              <View style={styles.modalContainer}>
+                <Text style={styles.modalTitle}>Chọn một Category:</Text>
+                {/* Thay FlatList bằng ScrollView để hiển thị hàng ngang */}
+                <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={styles.scrollContainer}>
+                  {Object.keys(listCategories).map((item) => (
+                    <TouchableOpacity
+                      key={item}
+                      style={styles.horizontalButton}
+                      onPress={() => handleCategorySelect(item)}>
+                      <Text style={styles.buttonText}>{item}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+                <TouchableOpacity
+                  style={styles.closeModalButton}
+                  onPress={() => setIsModalVisible(false)}>
+                  <Text style={styles.closeModalText}>Đóng</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Modal>
+          {/* Danh sách câu hỏi từ Category */}
+          {categoryQuestions.length > 0 && (
+            <FlatList
+              data={categoryQuestions}
+              keyExtractor={(item, index) => `${item}-${index}`}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  style={styles.categoryQuestionButton}
+                  onPress={() => {
+                    sendMessage(item);
+                    setCategoryQuestions([]);
+                  }}>
+                  <Text style={styles.categoryQuestionText}>{item}</Text>
+                </TouchableOpacity>
+              )}
+              contentContainerStyle={styles.categoryQuestionsContainer}
+            />
+          )}
         </>
       )}
     </KeyboardAvoidingView>
   );
 };
 
-const { height } = Dimensions.get('window');
 
 const styles = StyleSheet.create({
   chatArea: {
@@ -352,10 +424,11 @@ const styles = StyleSheet.create({
     padding: 10,
     borderTopWidth: 1,
     borderColor: '#DDD',
+    marginBottom: 25
   },
   input: {
     flex: 1,
-    height: 40,
+    height: 50,
     borderColor: '#CCC',
     borderWidth: 1,
     borderRadius: 5,
@@ -381,7 +454,9 @@ const styles = StyleSheet.create({
     fontSize: 18,
     textAlign: 'center',
     marginBottom: 20,
-    paddingTop: Platform.OS === 'ios' ? 50 : 0,
+    paddingTop: Platform.OS === 'ios' ? 20 : 0,
+    padding: 10,
+    columnGap: 10
   },
   startButton: {
     backgroundColor: '#007AFF',
@@ -390,6 +465,65 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   startButtonText: { color: '#FFF', fontSize: 16, fontWeight: 'bold' },
+  categoryQuestionsContainer: {
+    marginVertical: 10,
+    paddingHorizontal: 15,
+  },
+  categoryQuestionButton: {
+    padding: 10,
+    marginVertical: 5,
+    backgroundColor: '#f0f0f0',
+    borderRadius: 5,
+  },
+  categoryQuestionText: {
+    fontSize: 16,
+    color: '#333',
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', 
+  },
+  modalContainer: {
+    width: '90%',
+    maxHeight: '50%',
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 15,
+    alignItems: 'center', 
+    justifyContent: 'center',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    textAlign: 'center', 
+  },
+  closeModalButton: {
+    marginTop: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    backgroundColor: '#ff5c5c',
+    borderRadius: 5,
+  },
+  closeModalText: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  scrollContainer: {
+    flexDirection: 'row', 
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+  },
+  horizontalButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    backgroundColor: '#007AFF',
+    borderRadius: 5,
+    marginHorizontal: 5, 
+  },
 });
 
-export default TonTravelAIScreen;
+export default App;
