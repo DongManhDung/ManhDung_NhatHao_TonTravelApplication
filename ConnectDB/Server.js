@@ -27,13 +27,13 @@ app.get("/", (req, res) => {
 //   Backend xu ly chon chuyen bay
 // POST a flight after press button
 app.post("/addFlight", async (req, res) => {
-  const { text1, text2, selectedDate, adultCount, childCount, seatClass } =
+  const { text1, text2, selectedDate, adultCount, childCount } =
     req.body;
   try {
     const conn = await pool.getConnection();
     await conn.query(
-      "INSERT INTO flight_searches (departure, destination, start_date, adult, child, class) VALUES (?, ?, ?, ?, ?, ?)",
-      [text1, text2, selectedDate, adultCount, childCount, seatClass]
+      "INSERT INTO flight_searches (departure, destination, start_date, adult, child) VALUES (?, ?, ?, ?, ?)",
+      [text1, text2, selectedDate, adultCount, childCount]
     );
     conn.release();
     res.status(200).json({ success: true, message: "Flight added successfully!" });
@@ -74,6 +74,26 @@ app.delete("/deleteFlight/:id", async (req, res) => {
     res.status(500).json({ success: false, message: "Failed to delete flight data" });
   }
 });
+
+// backend xy lu chuyen bay
+// Get all flight data from database
+app.get("/getAllFlightsByDepAndDesAndClass", async (req, res) => {
+  const { text1, text2 } = req.query;
+  try {
+    const conn = await pool.getConnection();
+    const rows = await conn.query(
+      "SELECT * FROM flights WHERE CONCAT(startPlaceFullname, ' (', startPlace, ')') = ? AND CONCAT(endPlaceFullname, ' (', endPlace, ')') = ? ", [text1, text2]
+    );
+    conn.release();
+    res.json(rows);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Failed to get flight data" });
+  }
+});
+
+
+
 
 // Backend xu ly dang nhap
 // POST a user after press button
@@ -219,6 +239,8 @@ app.post("/changePassword", async (req, res) => {
     res.status(500).json({success: false, message: "Failed to update password" });
   }
 });
+
+
 
 // Start server
 const PORT = 3000;

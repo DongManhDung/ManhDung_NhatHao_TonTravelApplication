@@ -24,7 +24,7 @@ const Flight1 = ({navigation, route}) => {
   const [isChecked, setChecked] = useState(false);
   const [text1, setText1] = useState(route.params?.selectedValue1 || 'Hồ Chí Minh (SGN)');
                       
-  const [text2, setText2] = useState(route.params?.selectedValue2 || "Tokyo (NRT)");
+  const [text2, setText2] = useState(route.params?.selectedValue2 || "Hà Nội (HAN)");
 
   if (route.params?.selectedValue) {
     if (route.params?.selectedFor === 'button1') {
@@ -108,7 +108,7 @@ const Flight1 = ({navigation, route}) => {
       // POST data to server
       try{
         // 172.20.10.4 /addFlight POST text1, text2, selectedDate, adultCount, childCount, seatClass
-      const response = await apiRequest('/addFlight', 'POST', { text1, text2, selectedDate, adultCount, childCount, seatClass });
+      const response = await apiRequest('/addFlight', 'POST', { text1, text2, selectedDate, adultCount, childCount });
 
       if (response.success) {
         console.log('Flight added successfully!');
@@ -126,8 +126,9 @@ const Flight1 = ({navigation, route}) => {
         text1,
         text2,
         selectedDate,
-        seatClass,
-        totalPassengers
+        totalPassengers,
+        adultCount,
+        childCount,
       });
     }
     
@@ -304,7 +305,7 @@ const Flight1 = ({navigation, route}) => {
                 <View style={[style.formFullItem,style.disactivated]}>
                   <TouchableOpacity style={style.buttonShot} onPress={toggleModal}>
                     <Text style={style.textInputShort}>
-                        {adultCount} Adults, {childCount} Children, {seatClass}
+                        {adultCount} Adults, {childCount} Children
                     </Text>
                   </TouchableOpacity>
                 </View>
@@ -338,21 +339,6 @@ const Flight1 = ({navigation, route}) => {
                       <Text style={style.counterText}>+</Text>
                     </TouchableOpacity>
                   </View>
-
-                        {/* Chọn class 1 trong 4 */}
-                        <View style={style.option}>
-                          <Text>Class:</Text>
-                          <Picker
-                          selectedValue={seatClass}
-                          style={style.picker}
-                          onValueChange={(itemValue) => setSeatClass(itemValue)}
-                          >
-                            <Picker.Item label="Basic" value="Basic" />
-                            <Picker.Item label="Economy" value="Economy" />
-                            <Picker.Item label="Premium" value="Premium" />
-                            <Picker.Item label="Business" value="Business" />
-                          </Picker>
-                        </View>
 
                   <TouchableOpacity style={style.closeButton} onPress={toggleModal}>
                     <Text style={style.buttonText}>Close</Text>
@@ -413,16 +399,15 @@ const Flight1 = ({navigation, route}) => {
                   <Text style={style.boldText}>Child: {search.child}</Text>
                 </View>
 
-                <Text>Class: <Text style={style.boldText}>{search.class}</Text></Text>
-
                 <View style={{flexDirection: 'row', width: '100%', justifyContent: 'space-between', alignItems: 'center'}}>
                     <TouchableOpacity style={{flexDirection: 'row', alignItems: 'center', width: '25%'}}
                         onPress={() => navigation.navigate('Flight3', {
                           text1: search.departure,
                           text2: search.destination,
                           selectedDate: search.start_date,
-                          seatClass: search.class,
-                          totalPassengers: search.adult + search.child
+                          totalPassengers: search.adult + search.child,
+                          adultCount: search.adult,
+                          childCount: search.child
                         })
                       }
                     >

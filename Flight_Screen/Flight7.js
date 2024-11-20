@@ -10,9 +10,15 @@ import {
   ScrollView,
 } from "react-native";
 import AntIcon from "react-native-vector-icons/AntDesign";
+import moment from "moment";
 
 const Flight7 = ({navigation, route}) => {
-  const { item } = route.params;
+  const { item, seatClass, selectedDate ,totalPassengers, updatedPassengerDetails, selectedSeats, adultCount, childCount } = route.params;
+
+  const gates = ['G1', 'G2', 'G3', 'G4', 'G5', 'G6', 'G7', 'G8', 'G9', 'G10'];
+  const bookingData = {
+    fullName: updatedPassengerDetails[0].fullName,
+  };
   return (
     <ScrollView showsVerticalScrollIndicator={false}>
       <View style={style.container}>
@@ -30,6 +36,7 @@ const Flight7 = ({navigation, route}) => {
               </TouchableOpacity>
               
             </View>
+            
             
           </View>
           <Image
@@ -49,7 +56,7 @@ const Flight7 = ({navigation, route}) => {
 
                 <View style={style.logoContainer}>
                     <Image
-                    style={{width: '70%', height: '70%', objectFit: 'cover'}}
+                    style={{width: '70%', height: '100%', objectFit: 'cover'}}
                     source={require('../assets/ImgDesign/tontravel-logo-zip-file/RemoveBg/logo.png')}></Image>
                 </View>
 
@@ -62,16 +69,33 @@ const Flight7 = ({navigation, route}) => {
                     <Text style={[style.text,style.textCenter,{width: '60%', letterSpacing: 0.65}]}>Your ticket purchase successfully completed</Text>
                 </View>
 
+                {/* Test insert data here */}
                 <View style={style.boardingPassContainer}>
-                    
+                  <Text>Fullname: {updatedPassengerDetails[0].fullName}</Text>
+                  <Text>Gender: {updatedPassengerDetails[0].gender}</Text>
+                  <Text>Class: {item.class}</Text>
+                  <Text>Departure Date: {selectedDate}</Text>
+                  <Text>Adult: {adultCount}</Text>
+                  <Text>Child: {childCount}</Text>
+                  <Text>Total Passengers: {totalPassengers}</Text>
+                  <Text>From: {item.startPlaceFullname}</Text>
+                  <Text>To: {item.endPlaceFullname} </Text>
+                  <Text>Departure Time: {item.timeStart}</Text>
+                  <Text>Arrival Time: {item.timeEnd}</Text>
+                  <Text>Airline: {item.airline}</Text>
+                  <Text>Duration: {item.duration}</Text>
+                  <Text>Flight Number: {item.flightNumber}</Text>
+                  <Text>Seat: {selectedSeats}</Text>
+                  <Text>Direct: {item.direct}</Text>
+                  <Text>Gate: {gates[Math.floor(Math.random() * gates.length)]}</Text>
                 </View>
 
                 <View style={style.thanksContainer}>
                     <View style={style.thankFlud}>
                         <Text style={[style.text,style.textCenter, {width: '50%', letterSpacing: 0.65}]}>Thank you for using our service.</Text>
-                        <Image 
+                        {/* <Image 
                         style={{width: '40%', height: '100%', objectFit: 'cover'}}
-                        source={require('../assets/ImgDesign/Flight Screen/qr_code_PNG6.png')}></Image>
+                        source={require('../assets/ImgDesign/Flight Screen/qr_code_PNG6.png')}></Image> */}
                     </View>
                 </View>
 
@@ -226,7 +250,7 @@ const style = StyleSheet.create({
 
   logoContainer: {
     width: "100%",
-    height: 80,
+    height: 120,
     justifyContent: "center",
     alignContent: "center",
     alignItems: "center",
@@ -249,7 +273,6 @@ const style = StyleSheet.create({
   },
   boardingPassContainer: {
     width: "100%",
-    height: 150,
     justifyContent  : "center",
     alignContent: "center",
     alignItems: "center",

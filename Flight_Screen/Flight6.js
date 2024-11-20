@@ -10,14 +10,15 @@ import {
   KeyboardAvoidingView,
   Platform,
   Keyboard,
-  TouchableWithoutFeedback 
+  TouchableWithoutFeedback ,
+  FlatList
 } from "react-native";
 import AntIcon from "react-native-vector-icons/AntDesign";
 import {RadioButton} from "react-native-paper"
 import moment from "moment";
 
 const Flight1 = ({navigation, route}) => {
-  const { item, selectedSeat, seatClass, selectedDate ,totalPassengers } = route.params;
+  const { item, seatClass, selectedDate ,totalPassengers, updatedPassengerDetails, selectedSeats, adultCount, childCount } = route.params;
   const dateFormat = moment(selectedDate).format('ddd, MMM DD, YYYY');
   const [selectedValue, setSelectedValue] = useState('option1');
   // const items = [
@@ -31,8 +32,9 @@ const Flight1 = ({navigation, route}) => {
         <View style={style.containerFlud}>
           <View style={style.backGroup}>
             <View style={style.backItem}>
-              <TouchableOpacity style={{ width: "10%", height: 35 }}
-              onPress={() => navigation.goBack()}
+              <TouchableOpacity
+                style={{ width: "10%", height: 35 }}
+                onPress={() => navigation.goBack()}
               >
                 <AntIcon
                   name="arrowleft"
@@ -40,7 +42,6 @@ const Flight1 = ({navigation, route}) => {
                   style={{ bottom: 10 }}
                 ></AntIcon>
               </TouchableOpacity>
-              
             </View>
             <Text style={style.textTitle}>Book a flight</Text>
           </View>
@@ -58,57 +59,79 @@ const Flight1 = ({navigation, route}) => {
 
           <View style={style.formContainer}>
             <View style={style.formFlud}>
-                <View style={style.yourETicketContainer}>
-                  <Text style={[style.bigText, style.boldText]}>Your e-ticket</Text>
+              <View style={style.yourETicketContainer}>
+                <Text style={[style.bigText, style.boldText]}>
+                  Your e-ticket
+                </Text>
+              </View>
+
+              <View style={style.flightDetailContainer}>
+                <View style={style.flightLeftItem}>
+                  <View style={style.flightGroup}>
+                    <Image
+                      style={[
+                        style.icon4040,
+                        { width: "25%", height: "80%", objectFit: "contain" },
+                      ]}
+                      source={{ uri: item.logo }}
+                    ></Image>
+                    <Text style={[style.text]}>{item.airline}</Text>
+                  </View>
+
+                  <View style={[style.flightGroup, { height: 80 }]}>
+                    <View style={style.flghtGroupItems}>
+                      <Text style={[style.biggerFont, style.textBlur]}>
+                        {item.startPlace}
+                      </Text>
+                      <Text style={style.biggerFont}>{item.timeStart}</Text>
+                    </View>
+
+                    <View style={[style.flghtGroupItems, { width: "20%" }]}>
+                      <View style={style.itemAbsoluteGroup}>
+                        <Text style={[style.miniText, style.textBlur]}>
+                          {item.duration}
+                        </Text>
+                        <Image
+                          style={[style.icon4040]}
+                          source={require("../assets/ImgDesign/Flight Screen/Half_arrow-removebg-preview.png")}
+                        ></Image>
+                        <Text style={[style.miniText, style.textBlur]}>
+                          {item.direct}
+                        </Text>
+                      </View>
+                    </View>
+
+                    <View style={style.flghtGroupItems}>
+                      <Text style={[style.biggerFont, style.textBlur]}>
+                        {item.endPlace}
+                      </Text>
+                      <Text style={style.biggerFont}>{item.timeEnd}</Text>
+                    </View>
+                  </View>
+
+                  <View style={[style.flightGroup, { height: 40 }]}>
+                    <Text style={[style.text, { right: 10 }]}>
+                      {item.startPlaceFullName}
+                    </Text>
+                    <Text style={style.text}>{item.endPlaceFullName}</Text>
+                  </View>
                 </View>
 
-                <View style={style.flightDetailContainer}>
-                        <View style={style.flightLeftItem}>
-                            <View style={style.flightGroup}>
-                                <Image style={[style.icon4040, {width: 39}]} source={item.logo}></Image>
-                                <Text style={[style.text]}>{item.airline}</Text>
-                            </View>
+                <View style={style.flightRightItem}>
+                  <View style={style.imageFlightContainer}>
+                    <Image
+                      style={style.imageCover}
+                      source={{uri: item.airlineImage}}
+                    ></Image>
+                  </View>
 
-                            <View style={[style.flightGroup, {height: 80}]}>
-                                <View style={style.flghtGroupItems}>
-                                    <Text style={[style.biggerFont, style.textBlur]}>{item.startPlace}</Text>
-                                    <Text style={style.biggerFont}>{item.timeStart}</Text>
-                                </View>
-
-                                <View style={[style.flghtGroupItems, {width: '20%'}]}>
-                                    <View style={style.itemAbsoluteGroup}>
-                                        <Text style={[style.miniText, style.textBlur]}>{item.duration}</Text>
-                                        <Image style={[style.icon4040]} source={require("../assets/ImgDesign/Flight Screen/Half_arrow-removebg-preview.png")}></Image>
-                                        <Text style={[style.miniText, style.textBlur]}>{item.direct}</Text>
-                                    </View>
-                                </View>
-
-                                <View style={style.flghtGroupItems}>
-                                    <Text style={[style.biggerFont, style.textBlur]}>{item.endPlace}</Text>
-                                    <Text style={style.biggerFont}>{item.timeEnd}</Text>
-                                </View>
-                            </View>
-
-                            <View style={[style.flightGroup, {height: 40}]}>
-                                <Text style={[style.text, {right: 10}]}>{item.startPlaceFullName}</Text>
-                                <Text style={style.text}>{item.endPlaceFullName}</Text>
-                            </View>
-                        </View>
-
-                        <View style={style.flightRightItem}>
-                            <View style={style.imageFlightContainer}>
-                                <Image
-                                style={style.imageCover} 
-                                source={item.airlineImage}></Image>
-                            </View>
-
-                            <View style={style.dateTimeContainer}>
-                                <Text style={style.text}>{dateFormat}</Text>
-                            </View>
-                        </View>
+                  <View style={style.dateTimeContainer}>
+                    <Text style={style.text}>{selectedDate}</Text>
+                  </View>
                 </View>
+              </View>
 
-                <View style={style.baggageNoticeContainer}>
+              <View style={style.baggageNoticeContainer}>
                 <View style={style.baggageNoticeFlud}>
                   <View style={style.baggageLeftItem}>
                     <View style={style.baggageGroup}>
@@ -135,9 +158,7 @@ const Flight1 = ({navigation, route}) => {
                         { justifyContent: "flex-start", marginLeft: 10 },
                       ]}
                     >
-                      <Text style={style.miniText}>
-                        {item.carryOnBaggage}
-                      </Text>
+                      <Text style={style.miniText}>{item.carryOnBaggage}</Text>
                     </View>
 
                     <View
@@ -150,123 +171,158 @@ const Flight1 = ({navigation, route}) => {
                     </View>
                   </View>
                 </View>
-                </View>
+              </View>
 
-                <View style={style.informationContainer}>
-                    <View style={style.informationLeftItem}>
-                        <View style={style.informationLeftGroup}>
-                          <Text style={[style.textBlur]}>Passenger</Text>
-                          <Text style={style.text15}>{totalPassengers}</Text>
+              <View style={style.informationContainer}>
+                <View style={style.informationLeftItem}>
+                  <View style={style.informationLeftGroup}>
+                    <Text style={[style.textBlur]}>Passenger</Text>
+                    <Text style={style.text15}>{totalPassengers}</Text>
+                  </View>
+
+                  <View style={style.informationLeftGroup}>
+                    <Text style={[style.textBlur]}>Class</Text>
+                    <Text style={style.text15}>{seatClass}</Text>
+                  </View>
+
+                  <View style={style.informationLeftGroup}>
+                    <Text style={[style.textBlur, {top: 13}]}>Seat</Text>
+                    <FlatList
+                    showsVerticalScrollIndicator={false}
+                    showsHorizontalScrollIndicator={false}
+                      data={selectedSeats}
+                      keyExtractor={(seat, index) => index.toString()}
+                      renderItem={({ item : seat  }) => (
+                        <View style={{padding: 17, width: '100%', alignItems: 'center', marginTop: 10}}>
+                          <Text style={{fontSize: 18}}>{seat}</Text>
                         </View>
-
-                        <View style={style.informationLeftGroup}>
-                          <Text style={[style.textBlur]}>Class</Text>
-                          <Text style={style.text15}>{seatClass}</Text>
-                        </View>
-
-                        <View style={style.informationLeftGroup}>
-                          <Text style={[style.textBlur]}>Seat</Text>
-                          <Text style={style.text15}>{selectedSeat}</Text>
-                        </View>
-                    </View>
-
-                    <View style={style.informationRightItem}>
-                          <Text style={style.text}>Total</Text>
-                          <Text style={style.costBigRedText}>{item.discountPrice} &#8363;</Text>
-                    </View>
+                      )}
+                      contentContainerStyle={{width: '100%'}}
+                    />
+                  </View>
                 </View>
 
-                <View style={style.discountContainer}>
-                    <View style={style.discountItem}>
-                        <View style={style.discountGroup}>
-                            <Text style={style.biggerFont}>Discount Voucher</Text>
-                            <TouchableOpacity style={{height: '100%', justifyContent: 'center'}}>
-                              <Text style={[style.text, {color: '#023E8A'}]}>My vouchers</Text>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
+                <View style={style.informationRightItem}>
+                  <Text style={style.text}>Total</Text>
+                  <Text style={style.costBigRedText}>
+                    {Intl.NumberFormat("vi-VN").format(parseInt(item.discountPrice.replace(/\./g, ""), 10) * totalPassengers) } &#8363;
+                  </Text>
+                </View>
+              </View>
 
-                    <View style={style.discountItem}>
-                        <KeyboardAvoidingView 
-                        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-                        style={style.textInput100}>
-                          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-                            <TextInput style={style.textInput100} placeholder="Voucher code" editable inputMode='text'></TextInput>
-                          </TouchableWithoutFeedback>
-                        </KeyboardAvoidingView>
-                    </View>
+              <View style={style.discountContainer}>
+                <View style={style.discountItem}>
+                  <View style={style.discountGroup}>
+                    <Text style={style.biggerFont}>Discount Voucher</Text>
+                    <TouchableOpacity
+                      style={{ height: "100%", justifyContent: "center" }}
+                    >
+                      <Text style={[style.text, { color: "#023E8A" }]}>
+                        My vouchers
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
 
-                <View style={style.paymentMethodContainer}>
-                    <View style={style.paymentMethodFlud}>
-                      <View style={[style.paymentMethodItem, {justifyContent: 'center', borderWidth: 0}]}>
-                          <Text style={style.biggerFont}>Payment Method</Text>
-                      </View>
+                <View style={style.discountItem}>
+                  <KeyboardAvoidingView
+                    behavior={Platform.OS === "ios" ? "padding" : "height"}
+                    style={style.textInput100}
+                  >
+                    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                      <TextInput
+                        style={style.textInput100}
+                        placeholder="Voucher code"
+                        editable
+                        inputMode="text"
+                      ></TextInput>
+                    </TouchableWithoutFeedback>
+                  </KeyboardAvoidingView>
+                </View>
+              </View>
 
-                      <View style={style.paymentMethodItem}>
-                            <View style={style.paymentMethodGroup}>
-                                <Image
-                                style={style.icon6040}
-                                source={require('../assets/ImgDesign/Flight Screen/Payment/bca payment img.png')}></Image>
-                                <Text>BCA Virtual Account</Text>
-                                <RadioButton.Android
-                                value="option1"
-                                status={selectedValue === 'option1' ? 
-                                  'checked' : 'unchecked'}
-                                onPress={() => setSelectedValue('option1')}
-                                color="black"
-                                />
-                            </View>
-                      </View>
+              <View style={style.paymentMethodContainer}>
+                <View style={style.paymentMethodFlud}>
+                  <View
+                    style={[
+                      style.paymentMethodItem,
+                      { justifyContent: "center", borderWidth: 0 },
+                    ]}
+                  >
+                    <Text style={style.biggerFont}>Payment Method</Text>
+                  </View>
 
-                      <View style={style.paymentMethodItem}>
-                        <View style={style.paymentMethodGroup}>
-                                <Image
-                                style={[style.icon6040]}
-                                source={require('../assets/ImgDesign/Flight Screen/Payment/visa payment png.jpg')}></Image>
-                                <Text>Visa - 5*** *** **2</Text>
-                                <RadioButton.Android
-                                value="option2"
-                                status={selectedValue === 'option2' ? 
-                                  'checked' : 'unchecked'}
-                                onPress={() => setSelectedValue('option2')}
-                                color="black"
-                                />
-                            </View>
-                      </View>
-
-                      <View style={style.paymentMethodItem}>
-                            <View style={style.paymentMethodGroup}>
-                                <Image
-                                style={style.icon6040}
-                                source={require('../assets/ImgDesign/Flight Screen/Payment/logo-momo.png')}></Image>
-                                <Text>Momo E-vallet</Text>
-                                <RadioButton.Android
-                                value="option2"
-                                status={selectedValue === 'option3' ? 
-                                  'checked' : 'unchecked'}
-                                onPress={() => setSelectedValue('option3')}
-                                color="black"
-                                />
-                            </View>
-                      </View>
-
-                      
-
+                  <View style={style.paymentMethodItem}>
+                    <View style={style.paymentMethodGroup}>
+                      <Image
+                        style={style.icon6040}
+                        source={require("../assets/ImgDesign/Flight Screen/Payment/bca payment img.png")}
+                      ></Image>
+                      <Text>BCA Virtual Account</Text>
+                      <RadioButton.Android
+                        value="option1"
+                        status={
+                          selectedValue === "option1" ? "checked" : "unchecked"
+                        }
+                        onPress={() => setSelectedValue("option1")}
+                        color="black"
+                      />
                     </View>
+                  </View>
+
+                  <View style={style.paymentMethodItem}>
+                    <View style={style.paymentMethodGroup}>
+                      <Image
+                        style={[style.icon6040]}
+                        source={require("../assets/ImgDesign/Flight Screen/Payment/visa payment png.jpg")}
+                      ></Image>
+                      <Text>Visa - 5*** *** **2</Text>
+                      <RadioButton.Android
+                        value="option2"
+                        status={
+                          selectedValue === "option2" ? "checked" : "unchecked"
+                        }
+                        onPress={() => setSelectedValue("option2")}
+                        color="black"
+                      />
+                    </View>
+                  </View>
+
+                  <View style={style.paymentMethodItem}>
+                    <View style={style.paymentMethodGroup}>
+                      <Image
+                        style={style.icon6040}
+                        source={require("../assets/ImgDesign/Flight Screen/Payment/logo-momo.png")}
+                      ></Image>
+                      <Text>Momo E-vallet</Text>
+                      <RadioButton.Android
+                        value="option2"
+                        status={
+                          selectedValue === "option3" ? "checked" : "unchecked"
+                        }
+                        onPress={() => setSelectedValue("option3")}
+                        color="black"
+                      />
+                    </View>
+                  </View>
                 </View>
+              </View>
 
-                <View style={style.footerBtnContainer}>
-                        <TouchableOpacity style={style.footerBtn}
-                        onPress={() => navigation.navigate('Flight7', {item})}
-                        >
-                            <Text style={{fontSize: 17}}>Confirm and continue</Text>
-                        </TouchableOpacity>
-                </View>
-
-                
-
-
+              <View style={style.footerBtnContainer}>
+                <TouchableOpacity
+                  style={style.footerBtn}
+                  onPress={() => navigation.navigate("Flight7", { 
+                    item, 
+                    seatClass, 
+                    selectedDate,
+                    totalPassengers, 
+                    updatedPassengerDetails, 
+                    selectedSeats, 
+                    adultCount, 
+                    childCount})}>
+                  <Text style={{ fontSize: 17 }}>Confirm and continue</Text>
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
         </View>
@@ -482,7 +538,7 @@ const style = StyleSheet.create({
 
   baggageNoticeContainer: {
     width: "100%",
-    height: 70,
+    height: 100,
     justifyContent: "center",
     alignItems: "center",
     borderTopWidth: 0.5,

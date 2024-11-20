@@ -3,15 +3,21 @@
 
 const BASE_URL = 'http://10.10.88.77:3000';
 
-const apiRequest = async (endpoint, method = 'GET', body = null) => {
+const apiRequest = async (endpoint, method = 'GET', body = null, queryParams = null) => {
   try {
-    console.log(`Request: ${method} ${BASE_URL}${endpoint}`);
-    const response = await fetch(`${BASE_URL}${endpoint}`, {
+    let url = `${BASE_URL}${endpoint}`;
+    if (method === 'GET' && queryParams) {
+      const queryString = new URLSearchParams(queryParams).toString();
+      url += `?${queryString}`;
+    }
+
+    console.log(`Request: ${method} ${url}`);
+    const response = await fetch(url, {
       method, // Sử dụng method được truyền
       headers: {
         'Content-Type': 'application/json',
       },
-      body: body ? JSON.stringify(body) : null,
+      body: method !== 'GET' && body ? JSON.stringify(body) : null,
     });
 
     if (!response.ok) {
@@ -25,6 +31,8 @@ const apiRequest = async (endpoint, method = 'GET', body = null) => {
     throw error;
   }
 };
+
+
 
 export default apiRequest;
 

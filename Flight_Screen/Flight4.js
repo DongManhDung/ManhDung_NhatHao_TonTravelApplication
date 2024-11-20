@@ -15,24 +15,70 @@ import FontIsto from "react-native-vector-icons/Fontisto";
 import RadioForm, { RadioButtonInput } from "react-native-simple-radio-button";
 const screenHeight = Dimensions.get("window").height;
 const screenWidth = Dimensions.get("window").width;
-import moment from 'moment';
+import moment from "moment";
+import DateInputModal from "../Flight_Screen/DateInputModal";
 
-const Flight1 = ({navigation, route}) => {
+const Flight1 = ({ navigation, route }) => {
+  const currentYear = new Date().getFullYear();
   const [value, setValue] = useState(0);
-  const { item, selectedDate ,seatClass, totalPassengers } = route.params;
-  const dateFormat = moment(selectedDate).format('ddd, MMM DD, YYYY');
-  const items = [
-    { label: "Male", value: 0 },
-    { label: "Female", value: 1 },
-  ];
+  const {
+    item,
+    selectedDate,
+    seatClass,
+    totalPassengers,
+    childCount,
+    adultCount,
+  } = route.params;
+  const dateFormat = moment(selectedDate).format("ddd, MMM DD, YYYY");
+
+  const [passengerDetails, setPassengerDetails] = useState(
+    Array.from({ length: adultCount + childCount }, () => ({
+      fullName: "",
+      gender: "male",
+      dateOfBirth: "",
+      passportNumber: "",
+      countryRegion: "",
+      expirationDate: "",
+      address: "",
+      citizenId: "",
+      birthCertificate: "",
+      phone: "",
+    }))
+  );
+
+  const handleInputChange = (index, field, value) => {
+    const updatedPassengerDetails = [...passengerDetails];
+    updatedPassengerDetails[index][field] = value;
+    setPassengerDetails(updatedPassengerDetails);
+  };
+
+  const handleDateChange = (index, dateString, dateObject) => {
+    handleInputChange(index, "dateOfBirth", dateString);
+    handleInputChange(index, "dateObject", dateObject);
+  };
+
+  const handleFormSubmit = () => {
+    const passengersWithAdultStatus = passengerDetails.map((passenger, index) => ({ ...passenger, isAdult: index < adultCount, }));
+    navigation.navigate("Flight5", {
+      item,
+      seatClass,
+      selectedDate: dateFormat,
+      totalPassengers,
+      passengerDetails: passengersWithAdultStatus,
+      adultCount: adultCount,
+      childCount: childCount,
+    });
+  };
+
   return (
     <ScrollView showsVerticalScrollIndicator={false}>
       <View style={style.container}>
         <View style={style.containerFlud}>
           <View style={style.backGroup}>
             <View style={style.backItem}>
-              <TouchableOpacity style={{ width: "10%", height: 35 }}
-              onPress={() => navigation.goBack()}
+              <TouchableOpacity
+                style={{ width: "10%", height: 35 }}
+                onPress={() => navigation.goBack()}
               >
                 <AntIcon
                   name="arrowleft"
@@ -40,7 +86,6 @@ const Flight1 = ({navigation, route}) => {
                   style={{ bottom: 10 }}
                 ></AntIcon>
               </TouchableOpacity>
-              
             </View>
           </View>
           <Image
@@ -60,12 +105,12 @@ const Flight1 = ({navigation, route}) => {
               <View style={style.destinationContainer}>
                 <View style={style.destinationColumnItem}>
                   <View style={style.destinationGroupLeft}>
-                    <Text style={style.text}>{item.startPlaceFullName}</Text>
+                    <Text style={style.text}>{item.startPlaceFullname}</Text>
                     <Image
                       style={style.imgIconRotate90}
                       source={require("../assets/ImgDesign/Flight Screen/plane_icon-removebg-preview.png")}
                     ></Image>
-                    <Text style={style.text}>{item.endPlaceFullName}</Text>
+                    <Text style={style.text}>{item.endPlaceFullname}</Text>
                   </View>
                   <View style={style.destinationGroupRight}>
                     <View style={style.economySignal}>
@@ -78,12 +123,24 @@ const Flight1 = ({navigation, route}) => {
                   <View
                     style={[
                       style.destinationGroupLeft,
+                      { alignItems: "center", paddingHorizontal: 20 },
+                    ]}
+                  >
+                    <Text style={style.text}>({item.startPlace})</Text>
+                    <Text style={style.text}>({item.endPlace})</Text>
+                  </View>
+                </View>
+
+                <View style={style.destinationColumnItem}>
+                  <View
+                    style={[
+                      style.destinationGroupLeft,
                       { justifyContent: "flex-start" },
                     ]}
                   >
                     <Image
                       style={style.airlineIcon}
-                      source={item.logo}
+                      source={{ uri: item.logo }}
                     ></Image>
                     <Text style={style.text}>{item.airline}</Text>
                   </View>
@@ -97,7 +154,9 @@ const Flight1 = ({navigation, route}) => {
                       style={style.airlineIcon}
                       source={require("../assets/ImgDesign/Flight Screen/Clock_vectoricon (1).png")}
                     ></Image>
-                    <Text style={[style.text, style.textBlur]}>{item.duration}</Text>
+                    <Text style={[style.text, style.textBlur]}>
+                      {item.duration}
+                    </Text>
                   </View>
                 </View>
 
@@ -156,9 +215,7 @@ const Flight1 = ({navigation, route}) => {
                         { justifyContent: "flex-start", marginLeft: 10 },
                       ]}
                     >
-                      <Text style={style.miniText}>
-                        {item.carryOnBaggage}
-                      </Text>
+                      <Text style={style.miniText}>{item.carryOnBaggage}</Text>
                     </View>
 
                     <View
@@ -180,7 +237,7 @@ const Flight1 = ({navigation, route}) => {
 
                 <View style={style.costMiddleItem}>
                   <Text style={style.textCenter}>
-                    Tax included + Flight Insurance{" "}
+                    Tax included + Flight Insurance
                   </Text>
                   <Text style={[style.textCenter, style.safeText]}>
                     Free processing fee
@@ -188,9 +245,22 @@ const Flight1 = ({navigation, route}) => {
                 </View>
 
                 <View style={style.costRightItem}>
-                  <Text style={style.safeText}>{((parseFloat(item.originalPrice.replace(/\./g, '')) - parseFloat(item.discountPrice.replace(/\./g, ''))) / 1000).toLocaleString(undefined, { minimumFractionDigits: 3 })} &#8363; off</Text>
-                  <Text style={style.lineThroughText}>{item.originalPrice} &#8363;</Text>
-                  <Text style={style.costBigRedText}>{item.discountPrice} &#8363;</Text>
+                  <Text style={style.safeText}>
+                    {(
+                      (parseFloat(item.originalPrice.replace(/\./g, "")) -
+                        parseFloat(item.discountPrice.replace(/\./g, ""))) /
+                      1000
+                    ).toLocaleString(undefined, {
+                      minimumFractionDigits: 3,
+                    })}
+                    &#8363; off
+                  </Text>
+                  <Text style={style.lineThroughText}>
+                    {item.originalPrice} &#8363;
+                  </Text>
+                  <Text style={style.costBigRedText}>
+                    {item.discountPrice} &#8363;
+                  </Text>
                 </View>
               </View>
 
@@ -207,7 +277,7 @@ const Flight1 = ({navigation, route}) => {
                         style.left25Container,
                       ]}
                     >
-                      Full Name:{" "}
+                      Full Name:
                     </Text>
                     <TextInput style={style.inputText}></TextInput>
                   </View>
@@ -220,7 +290,7 @@ const Flight1 = ({navigation, route}) => {
                         style.left25Container,
                       ]}
                     >
-                      Email:{" "}
+                      Email:
                     </Text>
                     <TextInput style={style.inputText}></TextInput>
                   </View>
@@ -233,144 +303,235 @@ const Flight1 = ({navigation, route}) => {
                         style.left25Container,
                       ]}
                     >
-                      Phone:{" "}
+                      Phone:
                     </Text>
                     <TextInput style={style.inputText}></TextInput>
                   </View>
                 </View>
               </View>
 
-              <View
-                style={[
-                  style.bookerInformationContainer,
-                  style.customerInfoContainer,
-                ]}
-              >
-                <View style={style.bookerInformationFlud}>
-                  <View style={style.bookerInformationHeader}>
-                    <Text style={style.biggerFont}>Customer 1: Adult</Text>
-                  </View>
-
-                  <View style={style.genderContainer}>
-                    <View style={style.genderFlud}>
-                      <Text>
-                        Be Careful: Passenger information must match your ID +
-                        photo
-                      </Text>
-                      <View style={style.genderBoxGroup}>
-                        <RadioForm
-                          labelStyle={style.radioButtonLabel}
-                          buttonWrapStyle={style.radioButtonWrap}
-                          radio_props={items}
-                          onPress={(value) => setValue(value)}
-                          initial={value}
-                          buttonColor="black"
-                          selectedButtonColor="black"
-                          formHorizontal
-                          buttonSize={15}
-                        ></RadioForm>
+              {/* Loop customer form here */}
+              <View style={[style.customerInfoContainer]}>
+                <View>
+                  {passengerDetails.map((passenger, index) => {
+                    const isAdult = index < adultCount;
+                    const dateObject = passenger.dateObject;
+                    const age = dateObject
+                      ? currentYear - dateObject.getFullYear()
+                      : null;
+                    return (
+                      <View
+                        key={index}
+                        style={[style.bookerInformationFlud, { margin: 15 }]}
+                      >
+                        <View style={style.bookerInformationHeader}>
+                          <Text style={style.biggerFont}>
+                            Customer {index + 1}: {isAdult ? "Adult" : "Child"}
+                          </Text>
+                        </View>
+                        <View style={style.genderContainer}>
+                          <View style={style.genderFlud}>
+                            <Text>
+                              Be Careful: Passenger information must match your
+                              ID + photo
+                            </Text>
+                            <View style={style.genderBoxGroup}>
+                              <RadioForm
+                                labelStyle={style.radioButtonLabel}
+                                buttonWrapStyle={style.radioButtonWrap}
+                                radio_props={[
+                                  { label: "Male", value: "male" },
+                                  { label: "Female", value: "female" },
+                                ]}
+                                initial={0}
+                                buttonColor="black"
+                                selectedButtonColor="black"
+                                formHorizontal
+                                buttonSize={15}
+                                onPress={(value) =>
+                                  handleInputChange(index, "gender", value)
+                                }
+                              />
+                            </View>
+                          </View>
+                        </View>
+                        <View style={style.bookerInformationBody}>
+                          <Text
+                            style={[
+                              style.text,
+                              style.textBlur,
+                              style.left25Container,
+                            ]}
+                          >
+                            Full Name:
+                          </Text>
+                          <TextInput
+                            style={style.inputText}
+                            onChangeText={(value) =>
+                              handleInputChange(index, "fullName", value)
+                            }
+                            value={passenger.fullName}
+                          />
+                        </View>
+                        <View style={style.bookerInformationBody}>
+                          <Text
+                            style={[
+                              style.text,
+                              style.textBlur,
+                              style.left25Container,
+                            ]}
+                          >
+                            Date of birth:
+                          </Text>
+                          <DateInputModal
+                            onDateChange={(dateString, dateObject) =>
+                              handleDateChange(index, dateString, dateObject)
+                            }
+                          />
+                        </View>
+                        {isAdult ? (
+                          <>
+                            <View style={style.bookerInformationBody}>
+                              <Text
+                                style={[
+                                  style.text,
+                                  style.textBlur,
+                                  style.left25Container,
+                                ]}
+                              >
+                                Citizen ID:
+                              </Text>
+                              <TextInput
+                                style={style.inputText}
+                                onChangeText={(value) =>
+                                  handleInputChange(index, "citizenId", value)
+                                }
+                                value={passenger.citizenId}
+                              />
+                            </View>
+                            <View style={style.bookerInformationBody}>
+                              <Text
+                                style={[
+                                  style.text,
+                                  style.textBlur,
+                                  style.left25Container,
+                                ]}
+                              >
+                                Country/Region:
+                              </Text>
+                              <TextInput
+                                style={style.inputText}
+                                onChangeText={(value) =>
+                                  handleInputChange(
+                                    index,
+                                    "countryRegion",
+                                    value
+                                  )
+                                }
+                                value={passenger.countryRegion}
+                              />
+                            </View>
+                            <View style={style.bookerInformationBody}>
+                              <Text
+                                style={[
+                                  style.text,
+                                  style.textBlur,
+                                  style.left25Container,
+                                ]}
+                              >
+                                Expiration date:
+                              </Text>
+                              <TextInput
+                                style={style.inputText}
+                                onChangeText={(value) =>
+                                  handleInputChange(
+                                    index,
+                                    "expirationDate",
+                                    value
+                                  )
+                                }
+                                value={passenger.expirationDate}
+                              />
+                            </View>
+                            <View style={style.bookerInformationBody}>
+                              <Text
+                                style={[
+                                  style.text,
+                                  style.textBlur,
+                                  style.left25Container,
+                                ]}
+                              >
+                                Address:
+                              </Text>
+                              <TextInput
+                                style={style.inputText}
+                                onChangeText={(value) =>
+                                  handleInputChange(index, "address", value)
+                                }
+                                value={passenger.address}
+                              />
+                            </View>
+                          </>
+                        ) : (
+                          <View style={style.bookerInformationBody}>
+                            <Text
+                              style={[
+                                style.text,
+                                style.textBlur,
+                                style.left25Container,
+                              ]}
+                            >
+                              {age >= 14 ? "Citizen ID" : "Birth certificate"}:
+                            </Text>
+                            <TextInput
+                              style={style.inputText}
+                              onChangeText={(value) =>
+                                handleInputChange(
+                                  index,
+                                  age >= 14 ? "citizenId" : "birthCertificate",
+                                  value
+                                )
+                              }
+                              value={
+                                age >= 14
+                                  ? passenger.citizenId
+                                  : passenger.birthCertificate
+                              }
+                            />
+                          </View>
+                        )}
+                        <View style={style.bookerInformationBody}>
+                          <Text
+                            style={[
+                              style.text,
+                              style.textBlur,
+                              style.left25Container,
+                            ]}
+                          >
+                            Phone:
+                          </Text>
+                          <TextInput
+                            style={style.inputText}
+                            onChangeText={(value) =>
+                              handleInputChange(index, "phone", value)
+                            }
+                            value={passenger.phone}
+                          />
+                        </View>
                       </View>
-                    </View>
-                  </View>
-
-                  <View style={style.bookerInformationBody}>
-                    <Text
-                      style={[
-                        style.text,
-                        style.textBlur,
-                        style.left25Container,
-                      ]}
-                    >
-                      Full Name:{" "}
-                    </Text>
-                    <TextInput style={style.inputText}></TextInput>
-                  </View>
-
-                  <View style={style.bookerInformationBody}>
-                    <Text
-                      style={[
-                        style.text,
-                        style.textBlur,
-                        style.left25Container,
-                      ]}
-                    >
-                      Date of birth:{" "}
-                    </Text>
-                    <TextInput style={style.inputText}></TextInput>
-                  </View>
-
-                  <View style={style.bookerInformationBody}>
-                    <Text
-                      style={[
-                        style.text,
-                        style.textBlur,
-                        style.left25Container,
-                      ]}
-                    >
-                      Passport number:{" "}
-                    </Text>
-                    <TextInput style={style.inputText}></TextInput>
-                  </View>
-
-                  <View style={style.bookerInformationBody}>
-                    <Text
-                      style={[
-                        style.text,
-                        style.textBlur,
-                        style.left25Container,
-                      ]}
-                    >
-                      Country/Region:{" "}
-                    </Text>
-                    <TextInput style={style.inputText}></TextInput>
-                  </View>
-
-                  <View style={style.bookerInformationBody}>
-                    <Text
-                      style={[
-                        style.text,
-                        style.textBlur,
-                        style.left25Container,
-                      ]}
-                    >
-                      Expiration date:{" "}
-                    </Text>
-                    <TextInput style={style.inputText}></TextInput>
-                  </View>
-
-                  <View style={style.bookerInformationBody}>
-                    <Text
-                      style={[
-                        style.text,
-                        style.textBlur,
-                        style.left25Container,
-                      ]}
-                    >
-                      Address:{" "}
-                    </Text>
-                    <TextInput style={style.inputText}></TextInput>
-                  </View>
-
-                  <View style={style.bookerInformationBody}>
-                    <Text
-                      style={[
-                        style.text,
-                        style.textBlur,
-                        style.left25Container,
-                      ]}
-                    >
-                      Phone:{" "}
-                    </Text>
-                    <TextInput style={style.inputText}></TextInput>
-                  </View>
+                    );
+                  })}
                 </View>
               </View>
 
               <View style={style.footerBtnContainer}>
-                <TouchableOpacity style={style.footerBtn}
-                  onPress={() => navigation.navigate('Flight5', {item, seatClass, selectedDate, totalPassengers})}
+                <TouchableOpacity
+                  style={style.footerBtn}
+                  onPress={handleFormSubmit}
                 >
-                    <Text style={{fontSize: 17}}>Done, go to seat selection</Text>
+                  <Text style={{ fontSize: 17 }}>
+                    Done, go to seat selection
+                  </Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -437,11 +598,11 @@ const style = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: "column",
+    paddingBottom: 20,
   },
 
   containerFlud: {
     width: "100%",
-    height: 1500,
     backgroundColor: "#CAF0F8",
     // display: "flex",
     // justifyContent: "center",
@@ -459,7 +620,7 @@ const style = StyleSheet.create({
     justifyContent: "flex-start",
     flexDirection: "row",
     alignItems: "flex-end",
-    paddingVertical: 15
+    paddingVertical: 15,
   },
   textTitle: {
     fontSize: 20,
@@ -468,7 +629,7 @@ const style = StyleSheet.create({
     letterSpacing: 0.75,
     textAlign: "left",
     width: "95%",
-    height: 30
+    height: 30,
   },
   formContainer: {
     width: "100%",
@@ -489,7 +650,7 @@ const style = StyleSheet.create({
   },
   destinationContainer: {
     width: "100%",
-    height: 150,
+    height: 200,
     flexDirection: "column",
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,
@@ -615,19 +776,20 @@ const style = StyleSheet.create({
   },
   bookerInformationContainer: {
     width: "100%",
-    height: 220,
     justifyContent: "center",
     alignItems: "center",
+    paddingVertical: 30,
     // backgroundColor: 'cyan',
   },
   bookerInformationFlud: {
     width: "95%",
-    height: "95%",
     // backgroundColor: 'cyan',
     borderWidth: 0.5,
     borderColor: "gray",
     borderRadius: 10,
-    rowGap: 10,
+    rowGap: 12,
+    paddingVertical: 20,
+    paddingHorizontal: 10,
   },
   bookerInformationHeader: {
     width: "100%",
@@ -643,7 +805,9 @@ const style = StyleSheet.create({
     alignItems: "center",
   },
   customerInfoContainer: {
-    height: 550,
+    width: "100%",
+    justifyContent: "center",
+    alignItems: "center",
   },
   genderContainer: {
     width: "100%",
@@ -664,29 +828,28 @@ const style = StyleSheet.create({
     height: 45,
     justifyContent: "space-around",
     alignItems: "flex-start",
-    columnGap: 50
+    columnGap: 50,
   },
   radioButtonLabel: {
     fontSize: 16,
     paddingHorizontal: 60,
- },
- footerBtnContainer: {
+  },
+  footerBtnContainer: {
     width: "100%",
     height: 50,
     justifyContent: "center",
     alignItems: "center",
+    marginTop: 20,
+
     // backgroundColor: 'cyan',
- },
- footerBtn: {
+  },
+  footerBtn: {
     width: "70%",
     height: "100%",
-    backgroundColor: '#48CAE4',
+    backgroundColor: "#48CAE4",
     justifyContent: "center",
     alignContent: "center",
     alignItems: "center",
     borderRadius: 10,
-    position: "absolute",
-    bottom: 0,
-    zIndex: 1,
- },
+  },
 });

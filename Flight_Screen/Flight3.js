@@ -1,4 +1,4 @@
-import react, {useState} from "react";
+import react, {useState, useEffect} from "react";
 import {
   StyleSheet,
   Text,
@@ -16,6 +16,7 @@ import { FlatList } from "react-native-gesture-handler";
 const screenHeight = Dimensions.get("window").height;
 const screenWidth = Dimensions.get("window").width;
 import moment from 'moment';
+import apiRequest from '../Service/ApiService';
 
 
 
@@ -23,7 +24,9 @@ import moment from 'moment';
 const Flight1 = ({navigation, route}) => {
   
 
-  const {text1, text2, selectedDate, seatClass, totalPassengers} = route.params;
+  const {text1, text2, selectedDate, totalPassengers, adultCount , childCount} = route.params;
+  console.log(adultCount + ' Adult');
+  console.log(childCount + ' Child');
 
   const yesterday2date = moment(selectedDate, 'ddd, MMM DD, YYYY').clone().subtract(2, 'days');
   const yesterdayDate = moment(selectedDate, 'ddd, MMM DD, YYYY').clone().subtract(1, 'days');
@@ -68,114 +71,6 @@ const Flight1 = ({navigation, route}) => {
       price: 'From 3.252.292'
     }
   ];
-
-
-  const flightData = [
-    {
-      id: 1,
-      logo: require("../assets/ImgDesign/Flight Screen/Airplane Logo/vietjetAir.png"),
-      airlineImage: require("../assets/ImgDesign/Flight Screen/Airplane Image/Vietjet_Air_Airplane-removebg-preview.png"),
-      dateTime: [today,tomorrow,tomorrow2],
-      timeStart: "16:30",
-      timeEnd: "01:00",
-      startPlaceFullName: "Hồ Chí Minh",
-      startPlace: "SGN",
-      endPlaceFullName: "Tokyo",
-      endPlace: "HND",
-      airline: "Vietjet Air",
-      duration: '8h30m',
-      originalPrice: '3.376.198',
-      discountPrice: '3.252.292',
-      direct: 'Direct',
-      class: 'Economy',
-      carryOnBaggage: '1 piece per person, 7kg per piece',
-      checkedBaggage: '10kg per item'
-    },
-    {
-      id: 2,
-      logo: require("../assets/ImgDesign/Flight Screen/Airplane Logo/vietjetAir.png"),
-      airlineImage: require("../assets/ImgDesign/Flight Screen/Airplane Image/Vietjet_Air_Airplane-removebg-preview.png"),
-      dateTime: [today, yesterday, yesterday2],
-      timeStart: "23:20",
-      timeEnd: "07:40",
-      startPlaceFullName: "Hồ Chí Minh",
-      startPlace: "SGN",
-      endPlaceFullName: "Tokyo",
-      endPlace: "NRT",
-      airline: "Vietjet Air",
-      duration: '6h20m',
-      originalPrice: '4.090.970',
-      discountPrice: '3.940.831',
-      direct: '2 Stops',
-      class: 'Economy',
-      carryOnBaggage: '1 piece per person, 7kg per piece',
-      checkedBaggage: '10kg per item'
-    },
-    {
-      id: 3,
-      logo: require("../assets/ImgDesign/Flight Screen/Airplane Logo/VnAirlines.png"),  
-      airlineImage: require("../assets/ImgDesign/Flight Screen/Airplane Image/Vn_Airlines_Airplane-removebg-preview.png"),
-      dateTime: [today, tomorrow, tomorrow2, yesterday, yesterday2],
-      timeStart: "00:05",
-      timeEnd: "08:00",
-      startPlaceFullName: "Hồ Chí Minh",
-      startPlace: "SGN",
-      endPlaceFullName: "Tokyo",
-      endPlace: "NRT",
-      airline: "Vietnam Airlines",
-      duration: '7h55m',
-      originalPrice: '7.169.528',
-      discountPrice: '6.768.177',
-      direct: 'Direct',
-      class: 'Business',
-      carryOnBaggage: '1 piece per person, 10kg per piece',
-      checkedBaggage: '23kg per item',
-      boardingPass: require("../assets/ImgDesign/Flight Screen/Payment/VN Airlines Flight Ticket.png"),
-    },
-    {
-      id: 4,
-      logo: require("../assets/ImgDesign/Flight Screen/Airplane Logo/ANA logo.jpg"),
-      airlineImage: require("../assets/ImgDesign/Flight Screen/Airplane Image/All_Nippon_Airways_Airplane-removebg-preview.png"),
-      dateTime: [today, tomorrow2, yesterday],
-      timeStart: "07:00",
-      timeEnd: "23:00",
-      startPlaceFullName: "Hồ Chí Minh",
-      startPlace: "SGN",
-      endPlaceFullName: "Tokyo",
-      endPlace: "NRT",
-      airline: "All Nippon Airways",
-      duration: '16h00m',
-      originalPrice: '20.581.036',
-      discountPrice: '20.329.528',
-      direct: '2 Stops',
-      class: 'Economy',
-      carryOnBaggage: '1 piece per person, 10kg per piece',
-      checkedBaggage: '20kg per item'
-    },
-    {
-      id: 5,
-      logo: require("../assets/ImgDesign/Flight Screen/Airplane Logo/JapanAirlines.png"),
-      airlineImage: require("../assets/ImgDesign/Flight Screen/Airplane Image/Japan_Airlines_Airplane-removebg-preview.png"),
-      dateTime: [today, yesterday, yesterday, tomorrow2],
-      timeStart: "08:00",
-      timeEnd: "23:30",
-      startPlaceFullName: "Hồ Chí Minh",
-      startPlace: "SGN",
-      endPlaceFullName: "Tokyo",
-      endPlace: "HND",
-      airline: "Japan Airlines",
-      duration: '15h30m',
-      originalPrice: '23.181.787',
-      discountPrice: '22.932.680',
-      direct: '2 Stops',
-      class: 'Business',
-      carryOnBaggage: '1 piece per person, 10kg per piece',
-      checkedBaggage: '20kg per item'
-    },
-  ];
-  
-  
-  const filteredData = (selectedCategory === today ? flightData : flightData.filter(item => item.dateTime.includes(selectedCategory)));
   
 
 
@@ -192,16 +87,40 @@ const Flight1 = ({navigation, route}) => {
     );
   };
 
+  //api get all flight data
+  const [allFlight, setAllFlight] = useState([]);
+
+  const getFlightData = async () => {
+    try {
+      const response = await apiRequest('/getAllFlightsByDepAndDesAndClass', 'GET', null, {
+        text1: text1,
+        text2: text2,
+      });
+      console.log('API Response:', response);  // Log kết quả để kiểm tra
+      setAllFlight(response);
+    } catch (error) {
+      console.error('ERROR fetching recent searches: ', error);
+    }
+  };
+  
+
+  useEffect(() => {
+    getFlightData();
+  }, [])
+
+
+
   
 
   return (
     <ScrollView>
-<View style={style.container}>
-      <View style={style.containerFlud}>
-      <View style={style.backGroup}>
+      <View style={style.container}>
+        <View style={style.containerFlud}>
+          <View style={style.backGroup}>
             <View style={style.backItem}>
-              <TouchableOpacity style={{ width: "10%", height: 35 }}
-              onPress={() => navigation.goBack()}
+              <TouchableOpacity
+                style={{ width: "10%", height: 35 }}
+                onPress={() => navigation.goBack()}
               >
                 <AntIcon
                   name="arrowleft"
@@ -209,152 +128,255 @@ const Flight1 = ({navigation, route}) => {
                   style={{ bottom: 10 }}
                 ></AntIcon>
               </TouchableOpacity>
-              
             </View>
           </View>
-        <Image
-          opacity={0.35}
-          style={{
-            width: "100%",
-            height: 120,
-            objectFit: "cover",
-            position: "absolute",
-            zIndex: -1,
-          }}
-          source={require("../assets/ImgDesign/Flight Screen/Flight_bg-removebg-preview.png")}
-        ></Image>
+          <Image
+            opacity={0.35}
+            style={{
+              width: "100%",
+              height: 120,
+              objectFit: "cover",
+              position: "absolute",
+              zIndex: -1,
+            }}
+            source={require("../assets/ImgDesign/Flight Screen/Flight_bg-removebg-preview.png")}
+          ></Image>
 
-        <View style={style. destinationContainer}>
+          <View style={style.destinationContainer}>
             <View style={style.destinationFlud}>
-                <View style={style.destinationItem}>
-                    <Text style={style.destinationText}>{text1}</Text>
-                </View>
+              <View style={style.destinationItem}>
+                <Text style={[style.destinationText, {fontWeight: 'bold'}]}>{text1}</Text>
+              </View>
 
-                <View style={style.destinationItem}>
-                    <Text style={style.destinationText}>To</Text>
-                </View>
+              <View style={style.destinationItem}>
+                <Text style={style.destinationText}>To</Text>
+              </View>
 
-                <View style={style.destinationItem}>
-                    <Text style={style.destinationText}>{text2}</Text>
-                </View>
+              <View style={style.destinationItem}>
+                <Text style={[style.destinationText, {fontWeight: 'bold'}]}>{text2}</Text>
+              </View>
 
-                <View style={[style.destinationItem,{flexDirection: 'row', columnGap: 10}]}>
-                    <Text style={style.destinationText}>{selectedDate}</Text>
-                    <Text style={style.destinationText}>*</Text>
-                    <Text style={style.destinationText}>{totalPassengers} Passengers, {seatClass}</Text>
-                </View>
+              <View
+                style={[
+                  style.destinationItem,
+                  { flexDirection: "row", columnGap: 10 },
+                ]}
+              >
+                <Text style={style.destinationText}>{selectedDate}</Text>
+                <Text style={style.destinationText}>*</Text>
+                <Text style={style.destinationText}>
+                  {totalPassengers} Passengers
+                </Text>
+              </View>
             </View>
-        </View>
-
-        
-          <View style={style.slideContainer}>
-            <ScrollView horizontal contentContainerStyle={{columnGap: 20}}
-            showsHorizontalScrollIndicator={false}>
-                {
-                  categories.map((item) => <ChooseDayComponent item={item} key={item.name}></ChooseDayComponent>)
-                }
-              </ScrollView>
           </View>
-        
-        <View style={style.flightInfoContainer}>
-            <FlatList
-            keyExtractor={(item) => item.id}
-            data={filteredData}
-            renderItem={({item}) => (
-                <TouchableOpacity style={style.flightInfoItem}
-                onPress={() => {
-                  if(selectedCategory.includes(today)){
-                    const dateFormat = currentDate;
-                    navigation.navigate('Flight4', {
-                      item: item,
-                      selectedDate: dateFormat,
-                      seatClass: seatClass,
-                      totalPassengers: totalPassengers,
-                    });
-                  }
-                  else if(selectedCategory.includes(tomorrow))
-                  {
-                      const dateFormat = tomorrowDate;
-                      navigation.navigate('Flight4', {
-                        item: item,
-                        selectedDate: dateFormat,
-                        seatClass: seatClass,
-                        totalPassengers: totalPassengers,
-                      });
-                  }
-                  else if (selectedCategory.includes(tomorrow2)){
-                    const dateFormat = tomorrow2Date;
-                      navigation.navigate('Flight4', {
-                        item: item,
-                        selectedDate: dateFormat,
-                        seatClass: seatClass,
-                        totalPassengers: totalPassengers,
-                      });
-                  }
-                  else if (selectedCategory.includes(yesterday)){
-                    const dateFormat = yesterdayDate;
-                      navigation.navigate('Flight4', {
-                        item: item,
-                        selectedDate: dateFormat,
-                        seatClass: seatClass,
-                        totalPassengers: totalPassengers,
-                      });
-                  }
-                  else if (selectedCategory.includes(yesterday2)){
-                    const dateFormat = yesterday2date;
-                      navigation.navigate('Flight4', {
-                        item: item,
-                        selectedDate: dateFormat,
-                        seatClass: seatClass,
-                        totalPassengers: totalPassengers,
-                      });
-                  }
-                }}>
+
+          <View style={style.slideContainer}>
+            <ScrollView
+              horizontal
+              contentContainerStyle={{ columnGap: 20 }}
+              showsHorizontalScrollIndicator={false}
+            >
+              {categories.map((item) => (
+                <ChooseDayComponent
+                  item={item}
+                  key={item.name}
+                ></ChooseDayComponent>
+              ))}
+            </ScrollView>
+          </View>
+
+          <ScrollView style={style.flightInfoContainer} showsVerticalScrollIndicator={false} showsHorizontalScrollIndicator={false}>
+            {/* Log all flight here */}
+            {allFlight.length > 0 &&
+              allFlight.map((search, index) => (
+                <>
+                  <TouchableOpacity
+                    style={style.flightInfoItem}
+                    onPress={() => {
+                      if (selectedCategory.includes(today)) {
+                        const dateFormat = currentDate;
+                        navigation.navigate("Flight4", {
+                          item: search,
+                          selectedDate: dateFormat,
+                          seatClass: search.class,
+                          totalPassengers: totalPassengers,
+                          adultCount: adultCount,
+                          childCount: childCount,
+                        });
+                      } else if (selectedCategory.includes(tomorrow)) {
+                        const dateFormat = tomorrowDate;
+                        navigation.navigate("Flight4", {
+                          item: search,
+                          selectedDate: dateFormat,
+                          seatClass: search.class,
+                          totalPassengers: totalPassengers,
+                          adultCount: adultCount,
+                          childCount: childCount,
+                        });
+                      } else if (selectedCategory.includes(tomorrow2)) {
+                        const dateFormat = tomorrow2Date;
+                        navigation.navigate("Flight4", {
+                          item: search,
+                          selectedDate: dateFormat,
+                          seatClass: search.class,
+                          totalPassengers: totalPassengers,
+                          adultCount: adultCount,
+                          childCount: childCount,
+                        });
+                      } else if (selectedCategory.includes(yesterday)) {
+                        const dateFormat = yesterdayDate;
+                        navigation.navigate("Flight4", {
+                          item: search,
+                          selectedDate: dateFormat,
+                          seatClass: search.class,
+                          totalPassengers: totalPassengers,
+                          adultCount: adultCount,
+                          childCount: childCount,
+                        });
+                      } else if (selectedCategory.includes(yesterday2)) {
+                        const dateFormat = yesterday2date;
+                        navigation.navigate("Flight4", {
+                          item: search,
+                          selectedDate: dateFormat,
+                          seatClass: search.class,
+                          totalPassengers: totalPassengers,
+                          adultCount: adultCount,
+                          childCount: childCount,
+                        });
+                      }
+                    }}
+                  >
                     <View style={style.logoImageContainer}>
-                      <Image source={item.logo}
-                      style={{width: '90%', height: '50%', objectFit: 'contain'}}
+                      <Image
+                        source={{ uri: search.logo }}
+                        style={{
+                          width: "90%",
+                          height: "50%",
+                          resizeMode: "contain",
+                        }}
                       ></Image>
                     </View>
 
                     <View style={style.scheduleContainer}>
-                        <View style={style.scheduleItem}>
-                            <Text style={style.scheduleText}>{item.timeStart}</Text>
-                            <View style={{width: '30%',height: 20, flexDirection: 'column'}}>
-                              <Image style={{width: '100%', height: '60%'}} source={require("../assets/ImgDesign/Flight Screen/Half arrow.jpg")}></Image>
-                              <Text style={[style.blurText,{width: '100%', fontSize: 15, bottom: 2}]}>{item.duration}</Text>
+                      <View style={style.scheduleItem}>
+                        <Text style={style.scheduleText}>
+                          {search.timeStart}
+                        </Text>
+                        <View
+                          style={{
+                            width: "30%",
+                            height: 30,
+                            flexDirection: "column",
+                          }}
+                        >
+                          <Image
+                            style={{ width: "100%", height: 15, objectFit: "cover" }}
+                            source={require("../assets/ImgDesign/Flight Screen/Half arrow.jpg")}
+                          ></Image>
+                          <Text
+                            style={[
+                              style.blurText,
+                              { width: "100%", fontSize: 15, bottom: 2 },
+                            ]}
+                          >
+                            {search.duration}
+                          </Text>
+                        </View>
+
+                        <Text style={style.scheduleText}>{search.timeEnd}</Text>
+                      </View>
+
+                      <View style={style.scheduleItem}>
+                        <Text style={[style.scheduleText, style.blurText]}>
+                          {search.startPlace}
+                        </Text>
+                        <View
+                          style={{
+                            width: "40%",
+                            height: 20,
+                            flexDirection: "column",
+                          }}
+                        ></View>
+                        <Text style={[style.scheduleText, style.blurText]}>
+                          {search.endPlace}
+                        </Text>
+                      </View>
+
+                      <View
+                        style={[
+                          style.scheduleItem,
+                          {
+                            justifyContent: "flex-start",
+                            flexDirection: "row",
+                          },
+                        ]}
+                      >
+                        <Text style={{ marginLeft: 5 }}>{search.airline}</Text>
+                      </View>
+
+                      {(search.notePrice || search.noteFast) && (
+                        <View
+                          style={{
+                            position: "absolute",
+                            zIndex: 1,
+                            padding: 5,
+                            right: 10,
+                            bottom: 5,
+                            borderRadius: 5,
+                            justifyContent: "center",
+                            alignItems: "center",
+                            flexDirection: "row",
+                          }}
+                        >
+                          {search.notePrice && (
+                            <View style={{ marginHorizontal: 5 }}>
+                              <Text
+                                style={{ fontSize: 11, padding: 5,backgroundColor: "cyan", borderRadius: 5, color: "#023E8A", backgroundColor: '#90E0EF'}}>
+                                {search.notePrice}
+                              </Text>
                             </View>
-                            
-                            <Text style={style.scheduleText}>{item.timeEnd}</Text>
-                        </View>
+                          )}
 
-                        <View style={style.scheduleItem}>
-                          <Text style={[style.scheduleText,style.blurText]}>{item.startPlace}</Text>
-                          <View style={{width: '40%',height: 20, flexDirection: 'column'}}></View>
-                          <Text style={[style.scheduleText,style.blurText]}>{item.endPlace}</Text>
+                          {search.noteFast && (
+                            <View style={{ marginHorizontal: 5 }}>
+                              <Text style={{ fontSize: 11, padding: 5,backgroundColor: "cyan", borderRadius: 5, color: "#023E8A", backgroundColor: '#90E0EF'}}>
+                                {search.noteFast}
+                              </Text>
+                            </View>
+                          )}
                         </View>
-
-                        <View style={[style.scheduleItem,{justifyContent: 'flex-start',}]}>
-                          <Text style={{marginLeft: 5}}>Vietjet Air</Text>
-                        </View>
+                      )}
                     </View>
 
                     <View style={style.costContainer}>
-                        <View style={style.costContainerFlud}>
-                          <Text style={style.textLineThrough}>{item.originalPrice} &#8363;</Text>
-                          <Text style={style.textCost}>{item.discountPrice} &#8363;</Text>
-                          <TouchableOpacity style={style.flightDetailsGroup}>
-                            <Text style={style.toolText}>Choose</Text>
-                            <AntIcon name='right' style={{fontSize: 20, color: '#023E8A'}}></AntIcon>
-                          </TouchableOpacity>
-                        </View>
+                      <View style={style.costContainerFlud}>
+                        <Text style={style.textLineThrough}>
+                          {search.originalPrice} &#8363;
+                        </Text>
+                        <Text style={style.textCost}>
+                          {search.discountPrice} &#8363;
+                        </Text>
+                        <TouchableOpacity style={style.flightDetailsGroup}>
+                          <Text style={style.toolText}>Choose</Text>
+                          <AntIcon
+                            name="right"
+                            style={{ fontSize: 20, color: "#023E8A" }}
+                          ></AntIcon>
+                        </TouchableOpacity>
+                      </View>
+
+                      <View style={[style.costContainer,{position: "absolute", zIndex: 1, left: 0, width: '45%', justifyContent: 'center', alignItems: 'center'}]}>
+                          <Text style={{padding: 10, borderRadius: 5, backgroundColor: '#e3f2fd'}}>{search.class}</Text>
+                      </View>
                     </View>
+                    
                   </TouchableOpacity>
-            )}
-            ></FlatList>
+                </>
+              ))}
+          </ScrollView>
         </View>
-    
       </View>
-    </View>
     </ScrollView>
   );
 };
@@ -372,7 +394,7 @@ const style = StyleSheet.create({
   },
   containerFlud: {
     width: "100%",
-    height: 800,
+    height: 1060,
     backgroundColor: "#CAF0F8",
     // display: "flex",
     // justifyContent: "center",
@@ -474,8 +496,7 @@ const style = StyleSheet.create({
   },
   flightInfoContainer: {
     width: "100%",
-    height: 600,
-    marginTop: 5,
+    marginTop: 10,
     backgroundColor: "white",
     flexDirection: "column",
   },
