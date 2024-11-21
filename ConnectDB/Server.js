@@ -1,10 +1,14 @@
 const express = require("express");
 const mariadb = require("mariadb");
 const bodyParser = require("body-parser");
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
+// const bcrypt = require("bcrypt");
+// const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
 const cors = require("cors");
+// const fs = require("fs");
+// const path = require("path");
+// const RNHTMLtoPDF = require("react-native-html-to-pdf");
+// const { jsPDF } = require("jspdf");
 
 const app = express();
 
@@ -91,6 +95,76 @@ app.get("/getAllFlightsByDepAndDesAndClass", async (req, res) => {
     res.status(500).json({ success: false, message: "Failed to get flight data" });
   }
 });
+
+
+//Add flight ticket
+app.post("/addBookingFlight", async (req, res) => {
+    const { item, seatClass, selectedDate, totalPassengers, passengerDetails, selectedSeats, adultCount, childCount, price, gate, bookingCode  } = req.body;
+    try {
+        const conn = await pool.getConnection();
+        const query = `INSERT INTO bookings (airline, class, airPlaneLogoImg, bookingCode, fullName, dob, gender, citizenID, 
+                                            birthCertificate, expirationDate, address, phone, startPlace, endPlace, startPlaceFullName, 
+                                            endPlaceFullName, startPlaceAirportVNLang, startPlaceAirportENLang, endPlaceAirportVNLang, endPlaceAirportENLang,
+                                            timeStart, timeEnd, duration, price, direct, carryOnBaggage, checkedBaggage, flightNumber, website, 
+                                            adult, child, totalPassenger, departureDate, seat, gate, qrCodeImg)
+                       VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`;
+      for (let i = 0; i < passengerDetails.length; i++){
+        const passenger = passengerDetails[i];
+        const seat = selectedSeats[i];
+        await conn.query(query, [
+          item.airline,
+          seatClass,
+          item.logo,
+          bookingCode,
+          passenger.fullName,
+          passenger.dateOfBirth,
+          passenger.gender,
+          passenger.citizenId,
+          passenger.birthCertificate,
+          passenger.expirationDate,
+          passenger.address,
+          passenger.phone,
+          item.startPlace,
+          item.endPlace,
+          item.startPlaceFullname,
+          item.endPlaceFullname,
+          item.startPlaceAirportVNLang,
+          item.startPlaceAirportENLang,
+          item.endPlaceAirportVNLang,
+          item.endPlaceAirportENLang,
+          item.timeStart,
+          item.timeEnd,
+          item.duration,
+          price,
+          item.direct,
+          item.carryOnBaggage,
+          item.checkedBaggage,
+          item.flightNumber,
+          item.website,
+          adultCount,
+          childCount,
+          totalPassengers,
+          selectedDate,
+          seat,
+          gate,
+          ""
+        ]);
+      }
+      // conn.release();
+      res.status(200).json({ success: true, message: "Booking flight added successfully!" });
+      console.log("Add booking flight successfully!");
+      console.log(res);
+    } catch (error) {
+        console.error("ERROR: ", error);
+        res.status(500).json({ success: false, message: "Cannot add a booking flight!" });
+    }
+});
+
+
+
+
+
+
 
 
 

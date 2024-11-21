@@ -16,16 +16,86 @@ import {
 import AntIcon from "react-native-vector-icons/AntDesign";
 import {RadioButton} from "react-native-paper"
 import moment from "moment";
+import apiRequest from "../Service/ApiService";
 
 const Flight1 = ({navigation, route}) => {
-  const { item, seatClass, selectedDate ,totalPassengers, updatedPassengerDetails, selectedSeats, adultCount, childCount } = route.params;
-  const dateFormat = moment(selectedDate).format('ddd, MMM DD, YYYY');
-  const [selectedValue, setSelectedValue] = useState('option1');
-  // const items = [
-  //   {value: "BCA Virtual Account" },
-  //   {value: "Visa - 5*** *** **2" },
-  //   {value: "Momo E-vallet" },
-  // ];
+  const {
+    item,
+    seatClass,
+    selectedDate,
+    totalPassengers,
+    updatedPassengerDetails,
+    selectedSeats,
+    adultCount,
+    childCount,
+  } = route.params;
+  const dateFormat = moment(selectedDate).format("ddd, MMM DD, YYYY");
+  const [selectedValue, setSelectedValue] = useState("option1");
+
+ 
+
+  
+
+  const handleInsert = async () => {
+    // Hàm random cổng đợi
+    const generateRandomGate = () => {
+      const gates = ["G1", "G2", "G3", "G4", "G5", "G6", "G7", "G8", "G9", "G10"];
+      return gates[Math.floor(Math.random() * gates.length)];
+    };
+    const gate = generateRandomGate();
+
+    // Hàm random mã đặt chỗ gồm 12 kí tự bao gồm chữ và số, không trùng lặp lại
+    const generateUniqueBookingRef = () => {
+      const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+      let bookingCode = "";
+      for (let i = 0; i < 12; i++) {
+        bookingCode += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return bookingCode;
+    };
+    const bookingCode = generateUniqueBookingRef();
+
+    const price = Intl.NumberFormat("vi-VN").format(parseInt(item.discountPrice.replace(/\./g, ""), 10) * totalPassengers);
+
+    // POST data to server
+    try {
+      const response = await apiRequest("/addBookingFlight", "POST", {
+        item: item,
+        seatClass: seatClass,
+        selectedDate: selectedDate,
+        totalPassengers: totalPassengers,
+        passengerDetails: updatedPassengerDetails,
+        selectedSeats: selectedSeats,
+        adultCount: adultCount,
+        childCount: childCount,
+        price: price,
+        gate: gate,
+        bookingCode: bookingCode,
+      });
+      if (response.success) {
+        console.log("Flight added successfully!");
+        // Navigate to Flight7 screen
+        navigation.navigate("Flight7", {
+          item: item,
+          seatClass: seatClass,
+          selectedDate: selectedDate,
+          totalPassengers: totalPassengers,
+          passengerDetails: updatedPassengerDetails,
+          selectedSeats: selectedSeats,
+          adultCount: adultCount,
+          childCount: childCount,
+          price: price,
+          gate: gate,
+          bookingCode: bookingCode,
+        });
+      } else {
+        console.log("Cannot add a flight!");
+        return;
+      }
+    } catch (error) {
+      console.error("ERROR: ", error);
+    }
+  };
   return (
     <ScrollView showsVerticalScrollIndicator={false}>
       <View style={style.container}>
@@ -121,7 +191,7 @@ const Flight1 = ({navigation, route}) => {
                   <View style={style.imageFlightContainer}>
                     <Image
                       style={style.imageCover}
-                      source={{uri: item.airlineImage}}
+                      source={{ uri: item.airlineImage }}
                     ></Image>
                   </View>
 
@@ -186,18 +256,25 @@ const Flight1 = ({navigation, route}) => {
                   </View>
 
                   <View style={style.informationLeftGroup}>
-                    <Text style={[style.textBlur, {top: 13}]}>Seat</Text>
+                    <Text style={[style.textBlur, { top: 13 }]}>Seat</Text>
                     <FlatList
-                    showsVerticalScrollIndicator={false}
-                    showsHorizontalScrollIndicator={false}
+                      showsVerticalScrollIndicator={false}
+                      showsHorizontalScrollIndicator={false}
                       data={selectedSeats}
                       keyExtractor={(seat, index) => index.toString()}
-                      renderItem={({ item : seat  }) => (
-                        <View style={{padding: 17, width: '100%', alignItems: 'center', marginTop: 10}}>
-                          <Text style={{fontSize: 18}}>{seat}</Text>
+                      renderItem={({ item: seat }) => (
+                        <View
+                          style={{
+                            padding: 17,
+                            width: "100%",
+                            alignItems: "center",
+                            marginTop: 10,
+                          }}
+                        >
+                          <Text style={{ fontSize: 18 }}>{seat}</Text>
                         </View>
                       )}
-                      contentContainerStyle={{width: '100%'}}
+                      contentContainerStyle={{ width: "100%" }}
                     />
                   </View>
                 </View>
@@ -205,7 +282,11 @@ const Flight1 = ({navigation, route}) => {
                 <View style={style.informationRightItem}>
                   <Text style={style.text}>Total</Text>
                   <Text style={style.costBigRedText}>
-                    {Intl.NumberFormat("vi-VN").format(parseInt(item.discountPrice.replace(/\./g, ""), 10) * totalPassengers) } &#8363;
+                    {Intl.NumberFormat("vi-VN").format(
+                      parseInt(item.discountPrice.replace(/\./g, ""), 10) *
+                        totalPassengers
+                    )}{" "}
+                    &#8363;
                   </Text>
                 </View>
               </View>
@@ -311,15 +392,8 @@ const Flight1 = ({navigation, route}) => {
               <View style={style.footerBtnContainer}>
                 <TouchableOpacity
                   style={style.footerBtn}
-                  onPress={() => navigation.navigate("Flight7", { 
-                    item, 
-                    seatClass, 
-                    selectedDate,
-                    totalPassengers, 
-                    updatedPassengerDetails, 
-                    selectedSeats, 
-                    adultCount, 
-                    childCount})}>
+                  onPress={handleInsert}
+                >
                   <Text style={{ fontSize: 17 }}>Confirm and continue</Text>
                 </TouchableOpacity>
               </View>

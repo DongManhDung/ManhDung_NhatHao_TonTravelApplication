@@ -113,7 +113,9 @@ const Flight1 = ({navigation, route}) => {
   
 
   return (
-    <ScrollView>
+    <ScrollView showsHorizontalScrollIndicator={false}
+    showsVerticalScrollIndicator={false}
+    >
       <View style={style.container}>
         <View style={style.containerFlud}>
           <View style={style.backGroup}>
@@ -312,7 +314,7 @@ const Flight1 = ({navigation, route}) => {
                           },
                         ]}
                       >
-                        <Text style={{ marginLeft: 5 }}>{search.airline}</Text>
+                        <Text style={{fontSize: 13}}>{search.airline}</Text>
                       </View>
 
                       {(search.notePrice || search.noteFast) && (
@@ -394,11 +396,7 @@ const style = StyleSheet.create({
   },
   containerFlud: {
     width: "100%",
-    height: 1060,
     backgroundColor: "#CAF0F8",
-    // display: "flex",
-    // justifyContent: "center",
-    // alignItems: "center",
   },
   backGroup: {
     width: "100%",

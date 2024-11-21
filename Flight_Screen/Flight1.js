@@ -659,12 +659,13 @@ const style = StyleSheet.create({
     width: "100%",
     justifyContent: "flex-start",
     alignItems: "center",
-    paddingVertical: 20,
-    marginVertical: 50,
+    top: 70,
+    paddingBottom: 90,
     flexDirection: "column",
   },
   recentSearchedContainerFlud: {
     width: "95%",
+    height: "100%",
     justifyContent: "flex-start",
     alignItems: "flex-start",
     rowGap: 10
