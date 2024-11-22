@@ -97,11 +97,10 @@ const SearchFlight = ({ navigation, route }) => {
                         <View style={style.resultFormFlud}>
                             <View style={{flexDirection: 'row', borderRadius: 10}}>
                                 {/* LeftItem */}
-                                <View style={{flexDirection: 'column', width: '65%',borderWidth: 0.5, borderColor: 'gray'}}>
+                                <View style={{flexDirection: 'column', width: '70%',borderWidth: 0.5, borderColor: 'gray'}}>
                                     <View style={[style.itemComponent, style.row]}>
                                         <Text style={style.text}>
-                                            Họ và tên/Fullname: <Text style={[style.text, style.boldText]}>{search.fullName}  </Text> 
-                                            - <Text style={[style.text, style.boldText]}>  {search.gender}</Text>
+                                            Họ và tên/Fullname: <Text style={[style.text, style.boldText]}>{search.gender === 'male' ? 'MR' : 'MS'} {search.fullName}  </Text> 
                                         </Text> 
                                     </View>
     
@@ -132,13 +131,20 @@ const SearchFlight = ({ navigation, route }) => {
     
                                     <View style={[style.itemComponent, style.row]}>
                                         <Text style={style.text}>
-                                            Giờ khởi hành/Boarding time: <Text style={[style.text, style.boldText]}>{search.timeStart} - {search.timeEnd}</Text> 
+                                            Lịch trình/Boarding time: <Text style={[style.text, style.boldText]}>{search.timeStart} - {search.timeEnd}</Text> 
                                         </Text> 
+                                    </View>
+                                </View>
+
+                                {/* Insert img absolute leftItem */}
+                                <View style={{position: 'absolute', zIndex: 0, backgroundColor: 'transparent', width: '70%', height: 305}}>
+                                    <View style={{backgroundColor: 'transparent', width: 80, height: 60, top: 30, right: 0, position: 'absolute', zIndex: 1}}>
+                                        <Image style={{width: '100%', height: '100%', objectFit: 'contain'}} source={{uri: search.airPlaneLogoImg}}></Image>
                                     </View>
                                 </View>
                                 
                                 {/* RightItem */}
-                                <View style={{width: '35%', borderWidth: 0.5, borderColor: 'gray', justifyContent: 'flex-start', alignItems: 'center', height: '100%', flexDirection: 'column'}}>
+                                <View style={{width: '30%', borderWidth: 0.5, borderColor: 'gray', justifyContent: 'flex-start', alignItems: 'center', height: '100%', flexDirection: 'column'}}>
                                     {/* Top: Route */}
                                     <View style={{width: '100%', flexDirection: 'column', justifyContent: 'center',alignItems: 'center',padding: 10, height: '25%'}}>
                                         <Text style={style.text}>Destination</Text>
@@ -151,8 +157,8 @@ const SearchFlight = ({ navigation, route }) => {
                                     {/* Bottom: QRCode */}
                                     <View style={{justifyContent: 'center',alignItems: 'center', height: '75%'}}>
                                         {/* Change image from csdl */}
-                                        <Image source={require('../assets/ImgDesign/Flight Screen/qr_code_PNG6.png')}
-                                        style={{width: 200, height: 200, backgroundColor: 'yellow', objectFit: 'contain'}}
+                                        <Image source={{uri: search.qrCodeImg}}
+                                        style={{width: 150, height: 150, objectFit: 'contain'}}
                                         >
                                         </Image>
                                     </View>

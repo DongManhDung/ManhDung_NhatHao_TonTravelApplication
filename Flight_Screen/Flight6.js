@@ -10,15 +10,18 @@ import {
   KeyboardAvoidingView,
   Platform,
   Keyboard,
-  TouchableWithoutFeedback ,
-  FlatList
+  TouchableWithoutFeedback,
+  FlatList,
 } from "react-native";
 import AntIcon from "react-native-vector-icons/AntDesign";
-import {RadioButton} from "react-native-paper"
+import { RadioButton } from "react-native-paper";
 import moment from "moment";
 import apiRequest from "../Service/ApiService";
+import axios from 'axios';
 
-const Flight1 = ({navigation, route}) => {
+
+const Flight1 = ({ navigation, route }) => {
+  
   const {
     item,
     seatClass,
@@ -28,19 +31,26 @@ const Flight1 = ({navigation, route}) => {
     selectedSeats,
     adultCount,
     childCount,
-    username
+    username,
   } = route.params;
   const dateFormat = moment(selectedDate).format("ddd, MMM DD, YYYY");
   const [selectedValue, setSelectedValue] = useState("option1");
 
- 
-
-  
-
   const handleInsert = async () => {
     // Hàm random cổng đợi
     const generateRandomGate = () => {
-      const gates = ["G1", "G2", "G3", "G4", "G5", "G6", "G7", "G8", "G9", "G10"];
+      const gates = [
+        "G1",
+        "G2",
+        "G3",
+        "G4",
+        "G5",
+        "G6",
+        "G7",
+        "G8",
+        "G9",
+        "G10",
+      ];
       return gates[Math.floor(Math.random() * gates.length)];
     };
     const gate = generateRandomGate();
@@ -56,7 +66,11 @@ const Flight1 = ({navigation, route}) => {
     };
     const bookingCode = generateUniqueBookingRef();
 
-    const price = Intl.NumberFormat("vi-VN").format(parseInt(item.discountPrice.replace(/\./g, ""), 10) * totalPassengers);
+    const price = Intl.NumberFormat("vi-VN").format(
+      parseInt(item.discountPrice.replace(/\./g, ""), 10) * totalPassengers
+    );
+
+    
 
     // POST data to server
     try {
@@ -74,7 +88,14 @@ const Flight1 = ({navigation, route}) => {
         bookingCode: bookingCode,
         username: username,
       });
+
+      console.log("Response:", response);
+
+
       if (response.success) {
+        const qrCodeLinks = response.qrCodeLinks;
+        console.log("QR: ", qrCodeLinks);
+
         console.log("Flight added successfully!");
         // Navigate to Flight7 screen
         navigation.navigate("Flight7", {
@@ -90,6 +111,7 @@ const Flight1 = ({navigation, route}) => {
           gate: gate,
           bookingCode: bookingCode,
           username: username,
+          qrCodeLinks: qrCodeLinks,
         });
       } else {
         console.log("Cannot add a flight!");
@@ -415,7 +437,7 @@ const style = StyleSheet.create({
     fontSize: 11,
     letterSpacing: 0.25,
   },
-  boldText:{
+  boldText: {
     fontWeight: "bold",
   },
   text: {
@@ -444,9 +466,9 @@ const style = StyleSheet.create({
     color: "#088F08",
   },
   textInput100: {
-    width: '95%',
-    height: '100%', 
-    backgroundColor: '#f6f5f5',
+    width: "95%",
+    height: "100%",
+    backgroundColor: "#f6f5f5",
     fontSize: 17,
     letterSpacing: 0.5,
     paddingHorizontal: 10,
@@ -469,7 +491,7 @@ const style = StyleSheet.create({
     width: 60,
     height: 40,
     objectFit: "contain",
-    borderRadius: 10
+    borderRadius: 10,
   },
   imageCover: {
     width: "100%",
@@ -492,9 +514,7 @@ const style = StyleSheet.create({
   left25Container: {
     width: "25%",
   },
-  rowDirectionGroup: {
-
-  },
+  rowDirectionGroup: {},
   container: {
     flex: 1,
     flexDirection: "column",
@@ -520,7 +540,7 @@ const style = StyleSheet.create({
     justifyContent: "flex-start",
     flexDirection: "row",
     alignItems: "flex-end",
-    paddingVertical: 15
+    paddingVertical: 15,
   },
   textTitle: {
     fontSize: 20,
@@ -529,7 +549,7 @@ const style = StyleSheet.create({
     letterSpacing: 0.75,
     textAlign: "left",
     width: "95%",
-    height: 30
+    height: 30,
   },
   formContainer: {
     width: "100%",
@@ -585,7 +605,7 @@ const style = StyleSheet.create({
     justifyContent: "space-evenly",
     alignItems: "center",
   },
-  itemAbsoluteGroup:{
+  itemAbsoluteGroup: {
     justifyContent: "space-evenly",
     width: "100%",
     height: "20%",
@@ -703,8 +723,8 @@ const style = StyleSheet.create({
     width: "97%",
     height: "100%",
     flexDirection: "column",
-    justifyContent: 'space-evenly',
-    alignItems: 'center',
+    justifyContent: "space-evenly",
+    alignItems: "center",
   },
   paymentMethodItem: {
     width: "100%",
@@ -761,11 +781,11 @@ const style = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     // backgroundColor: 'cyan',
- },
- footerBtn: {
+  },
+  footerBtn: {
     width: "70%",
     height: "70%",
-    backgroundColor: '#48CAE4',
+    backgroundColor: "#48CAE4",
     justifyContent: "center",
     alignContent: "center",
     alignItems: "center",
@@ -773,5 +793,5 @@ const style = StyleSheet.create({
     position: "absolute",
     bottom: 0,
     zIndex: 1,
- },
+  },
 });

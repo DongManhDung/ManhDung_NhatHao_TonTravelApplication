@@ -27,7 +27,8 @@ const Flight7 = ({ navigation, route }) => {
     price,
     gate,
     bookingCode,
-    username
+    username,
+    qrCodeLinks
   } = route.params;
 
   // Hàm để tính thời gian trước 15 phút
@@ -41,7 +42,7 @@ const Flight7 = ({ navigation, route }) => {
 
 
   const generateHTMLContent = (item, seatClass, selectedDate, totalPassengers, passengerDetails,
-    selectedSeats, adultCount, childCount, price, gate, bookingCode) => {
+    selectedSeats, adultCount, childCount, price, gate, bookingCode, qrCodeLinks) => {
 
     let htmlContent  =`<!DOCTYPE html>
 <html lang="en">
@@ -163,7 +164,7 @@ const Flight7 = ({ navigation, route }) => {
                 <div class="row">
                     <div class="col-md-8">
                         <div class="details">
-                            <p><strong>Họ và tên/Name:</strong> ${passenger.fullName} - ${passenger.gender}</p>
+                            <p><strong>Họ và tên/Name:</strong> ${passenger.gender === 'male' ? 'MR' : 'MS' } ${ passenger.fullName}</p>
                             <p><strong>Nơi đi/From:</strong> ${item.startPlaceFullname} (${item.startPlace})</p>
                             <p><strong>Nơi đến/To:</strong> ${item.endPlaceFullname} (${item.endPlace})</p>
                             <p><strong>Ngày/Date:</strong> ${selectedDate}</p>
@@ -174,7 +175,7 @@ const Flight7 = ({ navigation, route }) => {
                         </div>
                     </div>
                     <div class="col-md-4 text-center qr-code">
-                        <img src="qr-code-placeholder.png" alt="QR Code">
+                        <img src="${qrCodeLinks[index]}" alt="QR Code">
                     </div>
                 </div>
                 <p class="note">Cửa ra máy bay sẽ đóng 15 phút trước giờ khởi hành. Hành khách không được chấp nhận nếu đến muộn. <br>
@@ -222,8 +223,8 @@ const Flight7 = ({ navigation, route }) => {
 };
 
   const printPDF = async (item, seatClass, selectedDate, totalPassengers, passengerDetails,
-    selectedSeats, adultCount, childCount, price, gate, bookingCode) => {
-      const htmlContent = generateHTMLContent(item, seatClass, selectedDate, totalPassengers, passengerDetails, selectedSeats, adultCount, childCount, price, gate, bookingCode);
+    selectedSeats, adultCount, childCount, price, gate, bookingCode, qrCodeLinks) => {
+      const htmlContent = generateHTMLContent(item, seatClass, selectedDate, totalPassengers, passengerDetails, selectedSeats, adultCount, childCount, price, gate, bookingCode, qrCodeLinks);
     try {
       await Print.printAsync({ html: htmlContent});
       console.log("PDF đã được in!");
@@ -233,7 +234,7 @@ const Flight7 = ({ navigation, route }) => {
   };
 
   printPDF(item, seatClass, selectedDate, totalPassengers, passengerDetails,
-    selectedSeats, adultCount, childCount, price, gate, bookingCode);
+    selectedSeats, adultCount, childCount, price, gate, bookingCode, qrCodeLinks);
 
   
 

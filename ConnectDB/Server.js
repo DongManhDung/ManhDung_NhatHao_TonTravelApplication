@@ -5,15 +5,18 @@ const bodyParser = require("body-parser");
 // const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
 const cors = require("cors");
-// const fs = require("fs");
-// const path = require("path");
-// const RNHTMLtoPDF = require("react-native-html-to-pdf");
-// const { jsPDF } = require("jspdf");
+const fs = require("fs");
+const path = require("path");
+const QRCode = require('qrcode');
+const axios = require('axios');
+const FormData = require('form-data');
 
 const app = express();
 
 app.use(bodyParser.json());
+app.use(express.json());
 app.use(cors());
+
 
 // Connect to mariaDB
 const pool = mariadb.createPool({
@@ -96,6 +99,38 @@ app.get("/getAllFlightsByDepAndDesAndClass", async (req, res) => {
   }
 });
 
+// Ham tao QR code
+const generateQRCode = async (data) => {
+  try {
+    const qrCodeDataUrl = await QRCode.toDataURL(data);
+    const base64Image = qrCodeDataUrl.split(";base64,").pop();
+    const fileName = `${Date.now()}.png`; // Tạo tên file từ thời gian hiện tại
+    const filePath = path.join(
+      __dirname,
+      "assets/QRData/qrcodes",
+      fileName
+    ); // Use relative path to save file
+    fs.writeFileSync(filePath, base64Image, { encoding: "base64" });
+    return filePath; // Trả về đường dẫn file
+  } catch (err) {
+    console.error("Error generating QR code:", err);
+    throw err;
+  }
+};
+
+// Function to upload QR code image to imgBB and get the direct link
+const uploadImageToImgbb = async (filePath) => {
+  const apiKey = "b9b15c2806d1f382d6f3ae0d6b4d6453"; // Replace with your imgBB API key
+  const form = new FormData();
+  form.append("image", fs.createReadStream(filePath));
+  const response = await axios.post(
+    `https://api.imgbb.com/1/upload?key=${apiKey}`,
+    form,
+    { headers: form.getHeaders() }
+  );
+  return response.data.data.url;
+};
+
 
 //Add flight ticket
 app.post("/addBookingFlight", async (req, res) => {
@@ -108,9 +143,15 @@ app.post("/addBookingFlight", async (req, res) => {
                                             timeStart, timeEnd, duration, price, direct, carryOnBaggage, checkedBaggage, flightNumber, website, 
                                             adult, child, totalPassenger, departureDate, seat, gate, qrCodeImg, username)
                        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`;
+      const qrCodeLinks = [];
+
       for (let i = 0; i < passengerDetails.length; i++){
         const passenger = passengerDetails[i];
         const seat = selectedSeats[i];
+        const qrCodeData = `${bookingCode}, ${passenger.fullName}, ${passenger.gender}, ${item.flightNumber}, ${item.startPlace}, ${item.endPlace}`; 
+        const qrCodePath = await generateQRCode(qrCodeData);
+        qrCodeDirectLink = await uploadImageToImgbb(qrCodePath);
+        qrCodeLinks.push(qrCodeDirectLink);
         await conn.query(query, [
           item.airline,
           seatClass,
@@ -147,12 +188,12 @@ app.post("/addBookingFlight", async (req, res) => {
           selectedDate,
           seat,
           gate,
-          "",
+          qrCodeDirectLink,
           username
         ]);
       }
       // conn.release();
-      res.status(200).json({ success: true, message: "Booking flight added successfully!" });
+      res.status(200).json({ success: true, message: "Booking flight added successfully!", qrCodeLinks });
       console.log("Add booking flight successfully!");
       console.log(res);
     } catch (error) {

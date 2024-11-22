@@ -203,7 +203,7 @@ const Flight1 = ({navigation, route}) => {
   
           </View>
         <Image
-          opacity={0.35}
+          opacity={0.15}
           style={{
             width: "100%",
             height: 180,
