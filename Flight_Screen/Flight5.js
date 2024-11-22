@@ -13,7 +13,7 @@ import AntIcon from "react-native-vector-icons/AntDesign";
 import moment from "moment";
 
 const Flight5 = ({ navigation, route }) => {
-  const { item, seatClass, selectedDate, totalPassengers, passengerDetails, selectedSeats: initialSelectedSeats = [], adultCount, childCount } =
+  const { item, seatClass, selectedDate, totalPassengers, passengerDetails, selectedSeats: initialSelectedSeats = [], adultCount, childCount, username } =
     route.params;
   const dateFormat = moment(selectedDate).format("ddd, MMM DD, YYYY");
   const [value, setValue] = useState(0);
@@ -104,6 +104,7 @@ const Flight5 = ({ navigation, route }) => {
         selectedSeats: [...selectedSeats, selectedSeat],
         adultCount,
         childCount,
+        username,
       });
       
     }

@@ -27,6 +27,7 @@ const Flight7 = ({ navigation, route }) => {
     price,
     gate,
     bookingCode,
+    username
   } = route.params;
 
   // Hàm để tính thời gian trước 15 phút

@@ -24,7 +24,7 @@ import apiRequest from '../Service/ApiService';
 const Flight1 = ({navigation, route}) => {
   
 
-  const {text1, text2, selectedDate, totalPassengers, adultCount , childCount} = route.params;
+  const {text1, text2, selectedDate, totalPassengers, adultCount , childCount, username} = route.params;
   console.log(adultCount + ' Adult');
   console.log(childCount + ' Child');
 
@@ -205,6 +205,7 @@ const Flight1 = ({navigation, route}) => {
                           totalPassengers: totalPassengers,
                           adultCount: adultCount,
                           childCount: childCount,
+                          username: username
                         });
                       } else if (selectedCategory.includes(tomorrow)) {
                         const dateFormat = tomorrowDate;
@@ -215,6 +216,7 @@ const Flight1 = ({navigation, route}) => {
                           totalPassengers: totalPassengers,
                           adultCount: adultCount,
                           childCount: childCount,
+                          username: username
                         });
                       } else if (selectedCategory.includes(tomorrow2)) {
                         const dateFormat = tomorrow2Date;
@@ -225,6 +227,7 @@ const Flight1 = ({navigation, route}) => {
                           totalPassengers: totalPassengers,
                           adultCount: adultCount,
                           childCount: childCount,
+                          username: username
                         });
                       } else if (selectedCategory.includes(yesterday)) {
                         const dateFormat = yesterdayDate;
@@ -235,6 +238,7 @@ const Flight1 = ({navigation, route}) => {
                           totalPassengers: totalPassengers,
                           adultCount: adultCount,
                           childCount: childCount,
+                          username: username
                         });
                       } else if (selectedCategory.includes(yesterday2)) {
                         const dateFormat = yesterday2date;
@@ -245,6 +249,7 @@ const Flight1 = ({navigation, route}) => {
                           totalPassengers: totalPassengers,
                           adultCount: adultCount,
                           childCount: childCount,
+                          username: username
                         });
                       }
                     }}

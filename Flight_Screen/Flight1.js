@@ -23,7 +23,7 @@ import  apiRequest  from "../Service/ApiService";
 const Flight1 = ({navigation, route}) => {
   const [isChecked, setChecked] = useState(false);
   const [text1, setText1] = useState(route.params?.selectedValue1 || 'Hồ Chí Minh (SGN)');
-                      
+  const { username } = route.params; 
   const [text2, setText2] = useState(route.params?.selectedValue2 || "Hà Nội (HAN)");
 
   if (route.params?.selectedValue) {
@@ -101,7 +101,9 @@ const Flight1 = ({navigation, route}) => {
   const handleSubmit = async () => {
     if(text1 === null || text2 === null || selectedDate === 'Select Departure Date' || (adultCount === 0 && childCount === 0)) {
       Alert.alert('Error','Please fill in all fields!');
-      navigation.navigate('Flight1');
+      console.log(username);
+      return;
+      
     }
     else {
       const totalPassengers = adultCount + childCount;
@@ -129,6 +131,7 @@ const Flight1 = ({navigation, route}) => {
         totalPassengers,
         adultCount,
         childCount,
+        username
       });
     }
     
@@ -186,8 +189,11 @@ const Flight1 = ({navigation, route}) => {
                   style={{ bottom: 10 }}
                 ></AntIcon>
               </TouchableOpacity>
-              
+              <TouchableOpacity style={{height: 35}} onPress={() => navigation.navigate('SearchFlight', {username})}>
+                <Text style={{fontSize: 19, textDecorationLine: 'underline', fontWeight: 'bold'}}>Booked? Search flight here!</Text>
+              </TouchableOpacity>
             </View>
+  
           </View>
         <Image
           opacity={0.35}
@@ -196,7 +202,7 @@ const Flight1 = ({navigation, route}) => {
             height: 180,
             objectFit: "cover",
             position: "absolute",
-            zIndex: -1,
+            zIndex: 0,
           }}
           source={require("../assets/ImgDesign/Flight Screen/Flight_bg-removebg-preview.png")}
         ></Image>
@@ -407,7 +413,8 @@ const Flight1 = ({navigation, route}) => {
                           selectedDate: search.start_date,
                           totalPassengers: search.adult + search.child,
                           adultCount: search.adult,
-                          childCount: search.child
+                          childCount: search.child,
+                          username: username
                         })
                       }
                     >
@@ -463,11 +470,13 @@ const style = StyleSheet.create({
     height: 100,
     justifyContent: "center",
     alignItems: "center",
+    position: "relative",
+    zIndex: 1,
   },
   backItem: {
     width: "95%",
     height: "100%",
-    justifyContent: "flex-start",
+    justifyContent: "space-between",
     flexDirection: "row",
     alignItems: "flex-end",
   },

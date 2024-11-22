@@ -28,6 +28,7 @@ const Flight1 = ({navigation, route}) => {
     selectedSeats,
     adultCount,
     childCount,
+    username
   } = route.params;
   const dateFormat = moment(selectedDate).format("ddd, MMM DD, YYYY");
   const [selectedValue, setSelectedValue] = useState("option1");
@@ -71,6 +72,7 @@ const Flight1 = ({navigation, route}) => {
         price: price,
         gate: gate,
         bookingCode: bookingCode,
+        username: username,
       });
       if (response.success) {
         console.log("Flight added successfully!");
@@ -87,6 +89,7 @@ const Flight1 = ({navigation, route}) => {
           price: price,
           gate: gate,
           bookingCode: bookingCode,
+          username: username,
         });
       } else {
         console.log("Cannot add a flight!");

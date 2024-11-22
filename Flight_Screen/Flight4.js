@@ -28,6 +28,7 @@ const Flight1 = ({ navigation, route }) => {
     totalPassengers,
     childCount,
     adultCount,
+    username
   } = route.params;
   const dateFormat = moment(selectedDate).format("ddd, MMM DD, YYYY");
 
@@ -67,6 +68,7 @@ const Flight1 = ({ navigation, route }) => {
       passengerDetails: passengersWithAdultStatus,
       adultCount: adultCount,
       childCount: childCount,
+      username: username,
     });
   };
 

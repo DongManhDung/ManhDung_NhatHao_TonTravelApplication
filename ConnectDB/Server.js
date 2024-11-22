@@ -99,15 +99,15 @@ app.get("/getAllFlightsByDepAndDesAndClass", async (req, res) => {
 
 //Add flight ticket
 app.post("/addBookingFlight", async (req, res) => {
-    const { item, seatClass, selectedDate, totalPassengers, passengerDetails, selectedSeats, adultCount, childCount, price, gate, bookingCode  } = req.body;
+    const { item, seatClass, selectedDate, totalPassengers, passengerDetails, selectedSeats, adultCount, childCount, price, gate, bookingCode, username  } = req.body;
     try {
         const conn = await pool.getConnection();
         const query = `INSERT INTO bookings (airline, class, airPlaneLogoImg, bookingCode, fullName, dob, gender, citizenID, 
                                             birthCertificate, expirationDate, address, phone, startPlace, endPlace, startPlaceFullName, 
                                             endPlaceFullName, startPlaceAirportVNLang, startPlaceAirportENLang, endPlaceAirportVNLang, endPlaceAirportENLang,
                                             timeStart, timeEnd, duration, price, direct, carryOnBaggage, checkedBaggage, flightNumber, website, 
-                                            adult, child, totalPassenger, departureDate, seat, gate, qrCodeImg)
-                       VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`;
+                                            adult, child, totalPassenger, departureDate, seat, gate, qrCodeImg, username)
+                       VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`;
       for (let i = 0; i < passengerDetails.length; i++){
         const passenger = passengerDetails[i];
         const seat = selectedSeats[i];
@@ -147,7 +147,8 @@ app.post("/addBookingFlight", async (req, res) => {
           selectedDate,
           seat,
           gate,
-          ""
+          "",
+          username
         ]);
       }
       // conn.release();
@@ -159,6 +160,22 @@ app.post("/addBookingFlight", async (req, res) => {
         res.status(500).json({ success: false, message: "Cannot add a booking flight!" });
     }
 });
+
+
+//Search flight ticket by bookingCode
+app.get("/getBookingFlightByBookingCode", async (req, res) => {
+  const { search, username } = req.query;
+  try {
+    const conn = await pool.getConnection();
+    const rows = await conn.query("SELECT * FROM bookings WHERE bookingCode = ? and username = ?", [search, username]);
+    conn.release();
+    res.json(rows);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Failed to get booked flight data" });
+  }
+});
+
 
 
 

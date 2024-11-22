@@ -43,6 +43,7 @@ import Flight5 from './Flight_Screen/Flight5.js';
 import Flight6 from './Flight_Screen/Flight6.js';
 import ListDestination from './Flight_Screen/ListDestination.js';
 import Flight7 from './Flight_Screen/Flight7.js';
+import SearchFlight from './Flight_Screen/SearchFlight.js';
 
 // Hotel Screen
 import HotelScreen1 from './HotelScreen/HotelScreen1.js';
@@ -90,6 +91,7 @@ export default function App() {
             <Stack.Screen name='Flight6' component={Flight6}></Stack.Screen>
             <Stack.Screen name='Flight7' component={Flight7}></Stack.Screen>
             <Stack.Screen name='ListDestination' component={ListDestination}></Stack.Screen>
+            <Stack.Screen name='SearchFlight' component={SearchFlight}></Stack.Screen>
 
             {/* Hotel Screen */}
             <Stack.Screen name='HotelScreen1' component={HotelScreen1}></Stack.Screen>

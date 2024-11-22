@@ -83,7 +83,10 @@ const HomeComponent = ({navigation}) => {
                    <View style={[style.optionItem, {borderWidth: 0}]}>
                        <View style={style.optionRowGroup}>
                            <TouchableOpacity style={style.optionSubItem}
-                           onPress={() => navigation.navigate('Flight1')}
+                           onPress={() => {
+                            navigation.navigate('Flight1', {username: username});
+                            console.log(username);
+                            }}
                            >
                                <Image 
                                style={[style.image, style.containImage]}
