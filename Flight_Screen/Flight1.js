@@ -102,8 +102,15 @@ const Flight1 = ({navigation, route}) => {
     if(text1 === null || text2 === null || selectedDate === 'Select Departure Date' || (adultCount === 0 && childCount === 0)) {
       Alert.alert('Error','Please fill in all fields!');
       console.log(username);
-      return;
-      
+      navigation.navigate('Flight1', {
+        text1,
+        text2,
+        selectedDate,
+        totalPassengers,
+        adultCount,
+        childCount,
+        username
+      });
     }
     else {
       const totalPassengers = adultCount + childCount;
